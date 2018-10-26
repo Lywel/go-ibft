@@ -14,5 +14,5 @@ var (
 	errFailedDecodePrepare    = errors.New("decode prepare failed")
 	errFailedDecodeCommit     = errors.New("decode commit failed")
 	errSubjectsDoNotMatch     = errors.New("subjects do not match")
-	errUnautorized            = errors.New("address not authorized")
+	errUnauthorized           = errors.New("address not authorized")
 )

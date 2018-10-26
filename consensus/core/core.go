@@ -16,6 +16,7 @@ type core struct {
 	state                 State
 	valSet                *consensus.ValidatorSet
 	current               *roundState
+	events								event.Handler
 	pendingRequests       *prque.Prque
 	pendingRequestsMu     *sync.Mutex
 	backlogs              map[*consensus.Validator]*prque.Prque
@@ -25,7 +26,7 @@ type core struct {
 }
 
 // NewCore initialize a new core
-func NewCore(backend *backend.Backend) Engine {
+func New(backend *backend.Backend) Engine {
 	return &core{
 		state: StateAcceptRequest,
 		logger: &Logger{
@@ -33,6 +34,7 @@ func NewCore(backend *backend.Backend) Engine {
 		},
 		backend:         backend,
 		pendingRequests: prque.New(),
+		events: event.New()
 		backlogs:        make(map[*consensus.Validator]*prque.Prque),
 	}
 }
@@ -188,7 +190,19 @@ func (c *core) ValidateFn(data []byte, sig []byte) (consensus.Address, error) {
 	address := crypto.PubkeyToAddress(signer)
 	i, _ := c.valSet.GetByAddress(address)
 	if i == -1 {
-		return address, errUnautorized
+		return address, errUnauthorized
 	}
 	return address, nil
+}
+
+func (c *core) handleEvents() {
+
+		for event := range c.events.EventChan {
+			switch event.(type) {
+			case RequestEvent:
+			case MessageEvent:
+			case BacklogEvent:
+			default:
+			}
+		}
 }

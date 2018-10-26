@@ -4,7 +4,7 @@ import (
 	"crypto/ecdsa"
 
 	eth "github.com/ethereum/go-ethereum/crypto"
-	"github.com/kaoes/ibft-go/consensus"
+	"github.com/Lywel/ibft-go/consensus"
 )
 
 func Sign(data []byte, privkey *ecdsa.PrivateKey) ([]byte, error) {

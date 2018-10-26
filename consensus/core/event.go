@@ -19,24 +19,13 @@ type BacklogEvent struct {
 }
 
 type Handler struct {
-	eventChan chan Event
+	EventChan chan Event
 }
 
 func New() Handler {
-	h := Handler{
+	return Handler{
 		eventChan: make(chan Event, eventChannelBufferSize),
 	}
-	go func() {
-		for event := range h.eventChan {
-			switch event.(type) {
-			case RequestEvent:
-			case MessageEvent:
-			case BacklogEvent:
-			default:
-			}
-		}
-	}()
-	return h
 }
 
 func (h Handler) Push(event Event) {
