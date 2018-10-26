@@ -2,9 +2,8 @@ package backend
 
 import (
 	"crypto/ecdsa"
-
 	"github.com/Lywel/go-ibft/consensus/"
-	"github.com/Lywel/go-ibft/consensuws/backend/crypto"
+	"github.com/Lywel/go-ibft/consensus/backend/crypto"
 )
 
 // Backend is
