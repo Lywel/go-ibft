@@ -58,9 +58,19 @@ type message struct {
 	Signature []byte
 }
 
-func (m *message) FromPayload(b []byte) error {
-	// TODO check signature
-	return rlp.DecodeBytes(b, &m)
+func (m *message) FromPayload(b []byte, validateFn func([]byte, []byte)
+		(consensus.Address, error)) error {
+	if err := rlp.DecodeBytes(b, &m); err != nil {
+		return err
+	}
+	payloadNoSig, err := m.PayloadNoSig()
+	if err != nil {
+		return err
+	}
+	_, err := validateFn(payloadNoSig, m.Signature)
+	return err
+
+
 }
 
 func (m *message) Payload() ([]byte, error) {

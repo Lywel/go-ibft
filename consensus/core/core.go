@@ -3,7 +3,9 @@ package core
 import (
 	"github.com/Lywel/ibft-go/consensus"
 	"github.com/Lywel/ibft-go/consensus/backend"
+	"github.com/ethereum/go-ethereum/crypto"
 	"gopkg.in/karalabe/cookiejar.v2/collections/prque"
+	"crypto/ecdsa"
 	"math/big"
 	"sync"
 )
@@ -56,7 +58,15 @@ func (c *core) currentView() *consensus.View {
 
 func (c *core) finalizeMessage(msg *message) ([]byte, error) {
 	msg.Address = c.address
-	// TODO sign message
+	data, err := msg.PayloadNoSig()
+	if err != nil {
+		return nil, err
+	}
+	msg.Signature, err = c.Backend.Sign(data)
+	if err != nil {
+		return nil, err
+	}
+
 	payload, err := msg.Payload()
 	if err != nil {
 		return nil, err
@@ -168,4 +178,17 @@ func (c *core) updateRoundState(view *consensus.View, valSet *consensus.Validato
 	} else {
 		c.current = newRoundState(view, nil, valSet, nil)
 	}
+}
+
+
+
+func (c *core) ValidateFn(data []byte, sig []byte) (consensus.Address, error) {
+	hashData := crypto.Keccak256([]byte(data))
+	signer, err := crypto.SigToPub(hashData, sig)
+	address := crypto.PubkeyToAddress(signer)
+	i, _ := c.valSet.GetByAddress(address)
+	if i == -1 {
+		return address, errUnautorized
+	}
+	return address, nil
 }

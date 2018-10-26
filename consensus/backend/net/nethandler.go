@@ -1,9 +1,10 @@
 package net
 
 import (
+	"log"
+
 	"github.com/Lywel/go-gossipnet"
 	"github.com/ethereum/go-ethereum/rlp"
-	"log"
 )
 
 // Handler handles data from the network
