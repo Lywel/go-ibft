@@ -3,7 +3,7 @@ package core
 import (
 	"math/big"
 
-	"github.com/Lywel/ibft-go/types"
+	"github.com/Lywel/go-ibft/types"
 )
 
 func newBlock(number int64) *types.Block {

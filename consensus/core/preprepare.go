@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/Lywel/ibft-go/consensus"
+	"github.com/Lywel/go-ibft/consensus"
 )
 
 func (c *core) sendPreprepare(request *consensus.Request) {

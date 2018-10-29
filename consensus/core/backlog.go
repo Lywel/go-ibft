@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/Lywel/ibft-go/consensus"
+	"github.com/Lywel/go-ibft/consensus"
 	"gopkg.in/karalabe/cookiejar.v2/collections/prque"
 )
 
@@ -85,18 +85,20 @@ func (c *core) processBacklogs() {
 				c.logger.Log("stop processing invalid backlog", "msg", msg)
 				continue
 			}
-			// send event backlog
+			c.events.Push(BacklogEvent{
+				Message: msg,
+			})
 		}
 
 	}
 }
 
-func toPriority(msgCode uint64, view *consensus.View) float32 {
-	if msgCode == typeRoundChange {
+func toPriority(msgType uint64, view *consensus.View) float32 {
+	if msgType == typeRoundChange {
 		// For msgRoundChange, set the message priority based on its sequence
 		return -float32(view.Sequence.Uint64() * 1000)
 	}
 	// 10 * Round limits the range of message code is from 0 to 9
 	// 1000 * Sequence limits the range of round is from 0 to 99
-	return -float32(view.Sequence.Uint64()*1000 + view.Round.Uint64()*10 + uint64(typePriority[msgCode]))
+	return -float32(view.Sequence.Uint64()*1000 + view.Round.Uint64()*10 + uint64(typePriority[msgType]))
 }

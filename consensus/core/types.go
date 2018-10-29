@@ -1,13 +1,28 @@
 package core
 
 import (
-	"github.com/Lywel/ibft-go/consensus"
+	"github.com/Lywel/go-ibft/consensus"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
-type Engine interface{}
+// Engine can be started and stoped
+type Engine interface {
+	Start()
+	Stop()
+}
 
+// TODO start() and stop()
+
+// State is an enum representing the current state
 type State uint
+
+// State* are core states
+const (
+	StateAcceptRequest State = iota
+	StatePreprepared
+	StatePrepared
+	StateCommitted
+)
 
 // Cmp compares s and y and returns:
 //   -1 if s is the previous state of y
@@ -22,13 +37,6 @@ func (s State) Cmp(y State) int {
 	}
 	return 0
 }
-
-const (
-	StateAcceptRequest State = iota
-	StatePreprepared
-	StatePrepared
-	StateCommitted
-)
 
 func (s State) String() string {
 	if s == StateAcceptRequest {
@@ -58,8 +66,7 @@ type message struct {
 	Signature []byte
 }
 
-func (m *message) FromPayload(b []byte, validateFn func([]byte, []byte)
-		(consensus.Address, error)) error {
+func (m *message) FromPayload(b []byte, validateFn func([]byte, []byte) (consensus.Address, error)) error {
 	if err := rlp.DecodeBytes(b, &m); err != nil {
 		return err
 	}
@@ -67,10 +74,8 @@ func (m *message) FromPayload(b []byte, validateFn func([]byte, []byte)
 	if err != nil {
 		return err
 	}
-	_, err := validateFn(payloadNoSig, m.Signature)
+	_, err = validateFn(payloadNoSig, m.Signature)
 	return err
-
-
 }
 
 func (m *message) Payload() ([]byte, error) {

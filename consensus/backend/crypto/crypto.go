@@ -3,18 +3,20 @@ package crypto
 import (
 	"crypto/ecdsa"
 
-	eth "github.com/ethereum/go-ethereum/crypto"
-	"github.com/Lywel/ibft-go/consensus"
+	"github.com/Lywel/go-ibft/consensus"
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
+// Sign returns the signature of data from from privateKey
 func Sign(data []byte, privkey *ecdsa.PrivateKey) ([]byte, error) {
-	hashData := eth.Keccak256([]byte(data))
-	return eth.Sign(hashData, privkey)
+	hashData := crypto.Keccak256([]byte(data))
+	return crypto.Sign(hashData, privkey)
 }
 
+// PubkeyToAddress returns an Address from a ecdsa.PublicKey
 func PubkeyToAddress(p ecdsa.PublicKey) consensus.Address {
-	ethAddress := eth.PubkeyToAddress(p)
-	var a Address
-	copy(a[AddressLength-len(ethAddress):], ethAddress[:])
+	ethAddress := crypto.PubkeyToAddress(p)
+	var a consensus.Address
+	copy(a[consensus.AddressLength-len(ethAddress):], ethAddress[:])
 	return a
 }

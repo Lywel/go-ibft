@@ -1,9 +1,8 @@
 package core
 
 import (
+	"github.com/Lywel/go-ibft/consensus"
 	"reflect"
-
-	"github.com/Lywel/ibft-go/consensus"
 )
 
 func (c *core) sendCommit() {

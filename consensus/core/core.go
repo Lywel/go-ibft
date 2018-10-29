@@ -1,11 +1,13 @@
 package core
 
 import (
-	"github.com/Lywel/ibft-go/consensus"
-	"github.com/Lywel/ibft-go/consensus/backend"
-	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/Lywel/go-ibft/consensus"
+	"github.com/Lywel/go-ibft/consensus/backend"
+	"github.com/Lywel/go-ibft/consensus/backend/crypto"
+	"github.com/Lywel/go-ibft/consensus/backend/network"
+	"github.com/Lywel/go-ibft/events"
+	eth "github.com/ethereum/go-ethereum/crypto"
 	"gopkg.in/karalabe/cookiejar.v2/collections/prque"
-	"crypto/ecdsa"
 	"math/big"
 	"sync"
 )
@@ -16,7 +18,8 @@ type core struct {
 	state                 State
 	valSet                *consensus.ValidatorSet
 	current               *roundState
-	events								event.Handler
+	events                events.Handler
+	networkManager        network.Manager
 	pendingRequests       *prque.Prque
 	pendingRequestsMu     *sync.Mutex
 	backlogs              map[*consensus.Validator]*prque.Prque
@@ -25,7 +28,7 @@ type core struct {
 	waitingForRoundChange bool
 }
 
-// NewCore initialize a new core
+// New initialize a new core
 func New(backend *backend.Backend) Engine {
 	return &core{
 		state: StateAcceptRequest,
@@ -34,10 +37,13 @@ func New(backend *backend.Backend) Engine {
 		},
 		backend:         backend,
 		pendingRequests: prque.New(),
-		events: event.New()
+		events:          events.New(),
 		backlogs:        make(map[*consensus.Validator]*prque.Prque),
 	}
 }
+
+func (c *core) Start() {}
+func (c *core) Stop()  {}
 
 func (c *core) isValidator(a consensus.Address) bool {
 	i, _ := c.valSet.GetByAddress(a)
@@ -64,7 +70,7 @@ func (c *core) finalizeMessage(msg *message) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	msg.Signature, err = c.Backend.Sign(data)
+	msg.Signature, err = c.backend.Sign(data)
 	if err != nil {
 		return nil, err
 	}
@@ -82,9 +88,9 @@ func (c *core) broadcast(msg *message) {
 		c.logger.Log("failed to finalize message", "msg", msg, "err", err)
 		return
 	}
-	// TODO broadcast payload
-	payload = payload
-	return
+	if err := c.networkManager.Broadcast(payload); err != nil {
+		c.logger.Log("failed to broadcast message", "msg", msg, "err", err)
+	}
 }
 
 func (c *core) verify(p consensus.Proposal) error {
@@ -182,27 +188,16 @@ func (c *core) updateRoundState(view *consensus.View, valSet *consensus.Validato
 	}
 }
 
-
-
 func (c *core) ValidateFn(data []byte, sig []byte) (consensus.Address, error) {
-	hashData := crypto.Keccak256([]byte(data))
-	signer, err := crypto.SigToPub(hashData, sig)
-	address := crypto.PubkeyToAddress(signer)
+	hashData := eth.Keccak256([]byte(data))
+	signer, err := eth.SigToPub(hashData, sig)
+	if err != nil {
+		return consensus.Address{}, err
+	}
+	address := crypto.PubkeyToAddress(*signer)
 	i, _ := c.valSet.GetByAddress(address)
 	if i == -1 {
 		return address, errUnauthorized
 	}
 	return address, nil
-}
-
-func (c *core) handleEvents() {
-
-		for event := range c.events.EventChan {
-			switch event.(type) {
-			case RequestEvent:
-			case MessageEvent:
-			case BacklogEvent:
-			default:
-			}
-		}
 }

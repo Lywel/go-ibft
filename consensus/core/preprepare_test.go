@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/Lywel/ibft-go/consensus"
+	"github.com/Lywel/go-ibft/consensus"
 )
 
 func newPreprepare(v *consensus.View) *consensus.Preprepare {

@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/Lywel/ibft-go/consensus"
+	"github.com/Lywel/go-ibft/consensus"
 )
 
 func (c *core) handleRequest(request *consensus.Request) error {
@@ -70,6 +70,8 @@ func (c *core) processPendingRequests() {
 		c.logger.Log("processing pending request", "number", r.Proposal.Number(),
 			"Hash", r.Proposal.Hash())
 
-		// TODO send request event
+		c.events.Push(RequestEvent{
+			Proposal: r.Proposal,
+		})
 	}
 }

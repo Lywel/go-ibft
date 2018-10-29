@@ -3,7 +3,7 @@ package core
 import (
 	"reflect"
 
-	"github.com/Lywel/ibft-go/consensus"
+	"github.com/Lywel/go-ibft/consensus"
 )
 
 func (c *core) sendPrepare() {
