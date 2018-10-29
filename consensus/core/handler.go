@@ -6,8 +6,12 @@ import (
 )
 
 func (c *core) handleEvents() {
+	c.wg.Add(1)
+	defer c.wg.Done()
 	for event := range c.events.EventChan() {
 		switch ev := event.(type) {
+		case network.MessageEvent:
+			c.handleMsg(ev.Payload)
 		case RequestEvent:
 			r := &consensus.Request{
 				Proposal: ev.Proposal,
@@ -18,13 +22,12 @@ func (c *core) handleEvents() {
 			} else if err != nil {
 				c.logger.Log("handle event request", "err", err)
 			}
-		case network.MessageEvent:
-			c.handleMsg(ev.Payload)
 		case BacklogEvent:
 			_, src := c.valSet.GetByAddress(ev.Message.Address)
 			c.handleCheckedMsg(ev.Message, src)
 		}
 	}
+	c.logger.Log("End of handle events")
 }
 
 // decodes message, checks and calls handleCheckedMsg

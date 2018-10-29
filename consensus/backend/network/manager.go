@@ -29,28 +29,43 @@ const (
 	backlogEvent
 )
 
+// New returns a new network.Manager
+func New(node *gossipnet.Node, events events.Handler) Manager {
+	return Manager{
+		node:   node,
+		events: events,
+	}
+}
+
 // Start starts to listen on node.EventChan()
 func (mngr Manager) Start() {
-	for event := range mngr.node.EventChan() {
-		switch ev := event.(type) {
-		case gossipnet.ConnOpenEvent:
-			log.Print("ConnOpenEvent")
-		case gossipnet.ConnCloseEvent:
-			log.Print("ConnCloseEvent")
-		case gossipnet.DataEvent:
-			log.Print("DataEvent")
-			var msg networkMessage
-			rlp.DecodeBytes(ev.Data, &msg)
-			mngr.events.Push(MessageEvent{
-				Payload: msg.Data,
-			})
-		case gossipnet.ListenEvent:
-			log.Print("ListenEvent")
-		case gossipnet.CloseEvent:
-			log.Print("CloseEvent")
-			break
+	go func() {
+		for event := range mngr.node.EventChan() {
+			switch ev := event.(type) {
+			case gossipnet.ConnOpenEvent:
+				log.Print("ConnOpenEvent")
+			case gossipnet.ConnCloseEvent:
+				log.Print("ConnCloseEvent")
+			case gossipnet.DataEvent:
+				log.Print("DataEvent")
+				var msg networkMessage
+				err := rlp.DecodeBytes(ev.Data, &msg)
+				if err != nil {
+					log.Print("Error parsing msg:", ev.Data)
+					continue
+				}
+				mngr.events.Push(MessageEvent{
+					Payload: msg.Data,
+				})
+			case gossipnet.ListenEvent:
+				log.Print("ListenEvent")
+			case gossipnet.CloseEvent:
+				log.Print("CloseEvent")
+				mngr.events.Close()
+				break
+			}
 		}
-	}
+	}()
 }
 
 // Broadcast implements network.Manager.Broadcast. It will tag the payload

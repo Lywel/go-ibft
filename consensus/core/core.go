@@ -26,24 +26,47 @@ type core struct {
 	backlogsMu            *sync.Mutex
 	logger                *Logger
 	waitingForRoundChange bool
+	wg                    sync.WaitGroup
 }
 
 // New initialize a new core
 func New(backend *backend.Backend) Engine {
+	eventHandler := events.New()
+	networkManager := network.New(backend.Network, eventHandler)
+	view := &consensus.View{
+		Round:    big.NewInt(0),
+		Sequence: big.NewInt(0),
+	}
 	return &core{
 		state: StateAcceptRequest,
 		logger: &Logger{
-			address: consensus.Address{},
+			address: backend.Address,
 		},
-		backend:         backend,
-		pendingRequests: prque.New(),
-		events:          events.New(),
-		backlogs:        make(map[*consensus.Validator]*prque.Prque),
+		backend:           backend,
+		pendingRequests:   prque.New(),
+		pendingRequestsMu: &sync.Mutex{},
+		backlogsMu:        &sync.Mutex{},
+		backlogs:          make(map[*consensus.Validator]*prque.Prque),
+		events:            eventHandler,
+		networkManager:    networkManager,
+		current:           newRoundState(view, nil, consensus.NewSet([]consensus.Address{backend.Address}), nil),
 	}
 }
 
-func (c *core) Start() {}
-func (c *core) Stop()  {}
+func (c *core) Start() {
+	c.backend.Network.Start()
+	c.networkManager.Start()
+	c.startNewRound(consensus.Big0)
+	c.logger.Log("Core started")
+	go c.handleEvents()
+}
+
+func (c *core) Stop() {
+	c.logger.Log("Stopping the core")
+	c.backend.Network.Stop()
+	c.wg.Wait()
+	c.logger.Log("Core stopped")
+}
 
 func (c *core) isValidator(a consensus.Address) bool {
 	i, _ := c.valSet.GetByAddress(a)
