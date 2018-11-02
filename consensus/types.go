@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"math/big"
 
+	"github.com/Lywel/go-gossipnet"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
@@ -16,6 +17,21 @@ var (
 	Big0 = big.NewInt(0)
 	Big1 = big.NewInt(1)
 )
+
+// Engine can be started and stoped
+type Engine interface {
+	Start()
+	Stop()
+}
+
+type Backend interface {
+	Start()
+	Stop()
+	Network() *gossipnet.Node
+	Address() Address
+	Sign(data []byte) ([]byte, error)
+	AddValidator(addr Address) bool
+}
 
 // Address of client
 type Address [AddressLength]byte
