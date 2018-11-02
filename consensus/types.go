@@ -44,6 +44,16 @@ func PubkeyToAddress(p ecdsa.PublicKey) Address {
 	return a
 }
 
+// GetBytes returns the address as bytes
+func (a Address) GetBytes() [AddressLength]byte {
+	return [AddressLength]byte(a)
+}
+
+// FromBytes poppulates the address from bytes in argument
+func (a *Address) FromBytes(data []byte) {
+	copy(a[AddressLength-len(data):], data)
+}
+
 func (a Address) String() string {
 	var bytes [AddressLength]byte
 	copy(bytes[:], a[:])
