@@ -5,14 +5,6 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
-// Engine can be started and stoped
-type Engine interface {
-	Start()
-	Stop()
-}
-
-// TODO start() and stop()
-
 // State is an enum representing the current state
 type State uint
 

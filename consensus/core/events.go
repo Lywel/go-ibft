@@ -13,3 +13,9 @@ type RequestEvent struct {
 type BacklogEvent struct {
 	Message *message
 }
+
+// StateEvent is emmitted when a peer joins the network
+type StateEvent struct {
+	valSet consensus.ValidatorSet
+	state  State
+}

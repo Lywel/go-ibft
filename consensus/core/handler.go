@@ -25,6 +25,16 @@ func (c *core) handleEvents() {
 		case BacklogEvent:
 			_, src := c.valSet.GetByAddress(ev.Message.Address)
 			c.handleCheckedMsg(ev.Message, src)
+		case network.JoinEvent:
+			c.logger.Log("New peer:", ev.Address)
+			c.backend.AddValidator(ev.Address)
+			if c.isProposer() {
+				// TODO:
+				//  - gather data new peer needs (state, addresses, sequence, ...)
+				//  - Serialize it properly (we can't ship a valSet as is)
+				//  - Send it to the peer (broadcast it for now)
+			}
+		case StateEvent:
 		}
 	}
 	c.logger.Log("End of handle events")
