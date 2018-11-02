@@ -5,13 +5,17 @@ import (
 	"github.com/Lywel/go-gossipnet"
 	"github.com/Lywel/go-ibft/consensus"
 	"github.com/Lywel/go-ibft/consensus/backend/crypto"
+	"github.com/Lywel/go-ibft/consensus/core"
 )
 
-// Backend is
-type Backend struct {
-	privateKey *ecdsa.PrivateKey
-	Address    consensus.Address
-	Network    *gossipnet.Node
+// Backend initializes the core, holds the keys and currenncy logic
+type backend struct {
+	privateKey  *ecdsa.PrivateKey
+	address     consensus.Address
+	network     *gossipnet.Node
+	core        consensus.Engine
+	coreRunning bool
+	valSet      *consensus.ValidatorSet
 }
 
 // Config is the backend configuration struct
@@ -21,16 +25,54 @@ type Config struct {
 }
 
 // New returns a new Backend
-func New(config *Config, privateKey *ecdsa.PrivateKey) Backend {
+func New(config *Config, privateKey *ecdsa.PrivateKey) consensus.Backend {
 	network := gossipnet.New(config.LocalAddr, config.RemoteAddrs)
-	return Backend{
+	address := crypto.PubkeyToAddress(privateKey.PublicKey)
+
+	backend := &backend{
 		privateKey: privateKey,
-		Address:    crypto.PubkeyToAddress(privateKey.PublicKey),
-		Network:    network,
+		address:    address,
+		network:    network,
+		valSet:     consensus.NewSet([]consensus.Address{address}),
 	}
+
+	backend.core = core.New(backend)
+	return backend
+}
+
+func (b *backend) Address() consensus.Address {
+	return b.address
+}
+
+func (b *backend) Network() *gossipnet.Node {
+	return b.network
+}
+
+func (b *backend) AddValidator(addr consensus.Address) bool {
+	return b.valSet.AddValidator(addr)
+}
+
+// Start implements Engine.Start
+func (b *backend) Start() {
+	if b.coreRunning {
+		return
+	}
+	b.network.Start()
+	b.core.Start()
+	b.coreRunning = true
+}
+
+// Stop implements Engine.Stop
+func (b *backend) Stop() {
+	if !b.coreRunning {
+		return
+	}
+	b.network.Stop()
+	b.core.Stop()
+	b.coreRunning = false
 }
 
 // Sign implements Backend.Sign
-func (b *Backend) Sign(data []byte) ([]byte, error) {
+func (b *backend) Sign(data []byte) ([]byte, error) {
 	return crypto.Sign(data, b.privateKey)
 }

@@ -4,7 +4,6 @@ import (
 	"crypto/ecdsa"
 	"crypto/rand"
 	"github.com/Lywel/go-ibft/consensus/backend"
-	"github.com/Lywel/go-ibft/consensus/core"
 	eth "github.com/ethereum/go-ethereum/crypto"
 	"log"
 	"os"
@@ -22,9 +21,7 @@ func main() {
 		RemoteAddrs: os.Args[2:],
 	}, privkey)
 
-	core := core.New(&backend)
-
-	core.Start()
-	defer core.Stop()
+	backend.Start()
+	defer backend.Stop()
 	time.Sleep(20 * time.Second)
 }

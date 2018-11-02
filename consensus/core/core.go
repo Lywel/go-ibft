@@ -2,7 +2,6 @@ package core
 
 import (
 	"github.com/Lywel/go-ibft/consensus"
-	"github.com/Lywel/go-ibft/consensus/backend"
 	"github.com/Lywel/go-ibft/consensus/backend/crypto"
 	"github.com/Lywel/go-ibft/consensus/backend/network"
 	"github.com/Lywel/go-ibft/events"
@@ -14,7 +13,7 @@ import (
 
 type core struct {
 	address               consensus.Address
-	backend               *backend.Backend
+	backend               consensus.Backend
 	state                 State
 	valSet                *consensus.ValidatorSet
 	current               *roundState
@@ -30,9 +29,9 @@ type core struct {
 }
 
 // New initialize a new core
-func New(backend *backend.Backend) Engine {
+func New(backend consensus.Backend) consensus.Engine {
 	eventHandler := events.New()
-	networkManager := network.New(backend.Network, eventHandler)
+	networkManager := network.New(backend.Network(), eventHandler)
 	view := &consensus.View{
 		Round:    big.NewInt(0),
 		Sequence: big.NewInt(0),
@@ -40,7 +39,7 @@ func New(backend *backend.Backend) Engine {
 	return &core{
 		state: StateAcceptRequest,
 		logger: &Logger{
-			address: backend.Address,
+			address: backend.Address(),
 		},
 		backend:           backend,
 		pendingRequests:   prque.New(),
@@ -49,21 +48,22 @@ func New(backend *backend.Backend) Engine {
 		backlogs:          make(map[*consensus.Validator]*prque.Prque),
 		events:            eventHandler,
 		networkManager:    networkManager,
-		current:           newRoundState(view, nil, consensus.NewSet([]consensus.Address{backend.Address}), nil),
+		current:           newRoundState(view, nil, consensus.NewSet([]consensus.Address{backend.Address()}), nil),
+		valSet:            consensus.NewSet([]consensus.Address{backend.Address()}),
 	}
 }
 
+// Start implements core.Start
 func (c *core) Start() {
-	c.backend.Network.Start()
-	c.networkManager.Start()
+	c.networkManager.Start(c.backend.Address())
 	c.startNewRound(consensus.Big0)
 	c.logger.Log("Core started")
 	go c.handleEvents()
 }
 
+// Stop implements core.Stop
 func (c *core) Stop() {
 	c.logger.Log("Stopping the core")
-	c.backend.Network.Stop()
 	c.wg.Wait()
 	c.logger.Log("Core stopped")
 }
