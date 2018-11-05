@@ -23,5 +23,5 @@ func main() {
 
 	backend.Start()
 	defer backend.Stop()
-	time.Sleep(20 * time.Second)
+	time.Sleep(240 * time.Second)
 }
