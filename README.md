@@ -31,14 +31,16 @@ containers. You should pass the ip of the other instances you want to connect
 to.
 
 ```sh
+# Local IP
+ip='192.168.2.176'
 # Instance 1 (listening on host:3000)
 sudo docker run --rm -p 3000:8080 lywel/go-ibft:latest
 # Instance 2 (listening on host:3001 and connecting to instance 1)
-sudo docker run --rm -p 3001:8080 lywel/go-ibft:latest :3000
+sudo docker run --rm -p 3001:8080 lywel/go-ibft:latest "$ip:3000"
 # Instance 3 (listening on host:3002 and connecting to instances 1 & 2)
-sudo docker run --rm -p 3002:8080 lywel/go-ibft:latest :3000 :3001
+sudo docker run --rm -p 3002:8080 lywel/go-ibft:latest "$ip:3000" "$ip:3001"
 # Instance 4 (listening on host:3003 and connecting to instance 3)
-sudo docker run --rm -p 3003:8080 lywel/go-ibft:latest :3002
+sudo docker run --rm -p 3003:8080 lywel/go-ibft:latest "$ip:3002"
 ```
 
 One an instance is launched you follow the logs (meaningless for now if you're

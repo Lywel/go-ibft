@@ -1,9 +1,9 @@
 package main
 
 import (
+	"bitbucket.org/ventureslash/go-ibft/consensus/backend"
 	"crypto/ecdsa"
 	"crypto/rand"
-	"bitbucket.org/ventureslash/go-ibft/consensus/backend"
 	eth "github.com/ethereum/go-ethereum/crypto"
 	"log"
 	"os"
@@ -17,8 +17,8 @@ func main() {
 	}
 
 	backend := backend.New(&backend.Config{
-		LocalAddr:   os.Args[1],
-		RemoteAddrs: os.Args[2:],
+		LocalAddr:   "0.0.0.0:8080",
+		RemoteAddrs: os.Args[1:],
 	}, privkey)
 
 	backend.Start()

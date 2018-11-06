@@ -15,7 +15,7 @@ RUN mkdir -p /root/.ssh && \
     GOOS=linux go build -a -installsuffix cgo -ldflags "-linkmode external -extldflags -static"
 
 FROM scratch
-EXPOSE 3000
+EXPOSE 8080
 COPY --from=builder /go-modules/go-ibft /go-ibft
 ENTRYPOINT ["/go-ibft"]
 
