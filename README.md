@@ -18,7 +18,7 @@ docker build --no-cache --build-arg SSH_KEY="$(cat ~/.ssh/id_rsa)" -t slash/go-i
 # >Successfully tagged slash/go-ibft:latest
 docker images slash/go-ibft
 # >REPOSITORY    ... SIZE
-# >lywel/go-ibft ... 6.48MB
+# >slash/go-ibft ... 6.48MB
 ```
 
 You should now have the `slash/go-ibft` image and thanks to golang self-containness
@@ -34,13 +34,13 @@ to.
 # Local IP
 ip='192.168.2.176'
 # Instance 1 (listening on host:3000)
-sudo docker run --rm -p 3000:8080 lywel/go-ibft:latest
+sudo docker run --rm -d -p 3000:8080 slash/go-ibft:latest
 # Instance 2 (listening on host:3001 and connecting to instance 1)
-sudo docker run --rm -p 3001:8080 lywel/go-ibft:latest "$ip:3000"
+sudo docker run --rm -d -p 3001:8080 slash/go-ibft:latest "$ip:3000"
 # Instance 3 (listening on host:3002 and connecting to instances 1 & 2)
-sudo docker run --rm -p 3002:8080 lywel/go-ibft:latest "$ip:3000" "$ip:3001"
+sudo docker run --rm -d -p 3002:8080 slash/go-ibft:latest "$ip:3000" "$ip:3001"
 # Instance 4 (listening on host:3003 and connecting to instance 3)
-sudo docker run --rm -p 3003:8080 lywel/go-ibft:latest "$ip:3002"
+sudo docker run --rm -d -p 3003:8080 slash/go-ibft:latest "$ip:3002"
 ```
 
 One an instance is launched you follow the logs (meaningless for now if you're
