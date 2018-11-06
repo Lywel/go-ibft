@@ -1,10 +1,10 @@
 package core
 
 import (
-	"github.com/Lywel/go-ibft/consensus"
-	"github.com/Lywel/go-ibft/consensus/backend/crypto"
-	"github.com/Lywel/go-ibft/consensus/backend/network"
-	"github.com/Lywel/go-ibft/events"
+	"bitbucket.org/ventureslash/go-ibft/consensus"
+	"bitbucket.org/ventureslash/go-ibft/consensus/backend/crypto"
+	"bitbucket.org/ventureslash/go-ibft/consensus/backend/network"
+	"bitbucket.org/ventureslash/go-ibft/events"
 	eth "github.com/ethereum/go-ethereum/crypto"
 	"gopkg.in/karalabe/cookiejar.v2/collections/prque"
 	"math/big"

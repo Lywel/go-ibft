@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"math/big"
 
-	"github.com/Lywel/go-gossipnet"
+	"bitbucket.org/ventureslash/go-gossipnet"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 

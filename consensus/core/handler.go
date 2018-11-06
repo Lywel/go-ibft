@@ -1,8 +1,8 @@
 package core
 
 import (
-	"github.com/Lywel/go-ibft/consensus"
-	"github.com/Lywel/go-ibft/consensus/backend/network"
+	"bitbucket.org/ventureslash/go-ibft/consensus"
+	"bitbucket.org/ventureslash/go-ibft/consensus/backend/network"
 )
 
 func (c *core) handleEvents() {

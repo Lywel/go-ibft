@@ -3,7 +3,7 @@ package core
 import (
 	"testing"
 
-	"github.com/Lywel/go-ibft/consensus"
+	"bitbucket.org/ventureslash/go-ibft/consensus"
 )
 
 var (

@@ -2,10 +2,10 @@ package backend
 
 import (
 	"crypto/ecdsa"
-	"github.com/Lywel/go-gossipnet"
-	"github.com/Lywel/go-ibft/consensus"
-	"github.com/Lywel/go-ibft/consensus/backend/crypto"
-	"github.com/Lywel/go-ibft/consensus/core"
+	"bitbucket.org/ventureslash/go-gossipnet"
+	"bitbucket.org/ventureslash/go-ibft/consensus"
+	"bitbucket.org/ventureslash/go-ibft/consensus/backend/crypto"
+	"bitbucket.org/ventureslash/go-ibft/consensus/core"
 )
 
 // Backend initializes the core, holds the keys and currenncy logic

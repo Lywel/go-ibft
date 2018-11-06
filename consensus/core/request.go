@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/Lywel/go-ibft/consensus"
+	"bitbucket.org/ventureslash/go-ibft/consensus"
 )
 
 func (c *core) handleRequest(request *consensus.Request) error {

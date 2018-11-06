@@ -3,7 +3,7 @@ package core
 import (
 	"fmt"
 
-	"github.com/Lywel/go-ibft/consensus"
+	"bitbucket.org/ventureslash/go-ibft/consensus"
 )
 
 // Logger helps printing clears logs

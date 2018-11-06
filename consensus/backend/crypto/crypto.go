@@ -3,7 +3,7 @@ package crypto
 import (
 	"crypto/ecdsa"
 
-	"github.com/Lywel/go-ibft/consensus"
+	"bitbucket.org/ventureslash/go-ibft/consensus"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 

@@ -1,20 +1,21 @@
 FROM golang:latest as builder
 WORKDIR /go-modules
 
-# create ssh directory
-RUN mkdir ~/.ssh
-RUN touch ~/.ssh/known_hosts
-RUN ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
-
-# allow private repo pull
-ARG github_oauth
-RUN git config --global url."https://$github_oauth:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+ARG SSH_KEY
+ARG SSH_KEY_PASSPHRASE
 
 COPY . ./
-RUN GOOS=linux go build -a -installsuffix cgo -ldflags "-linkmode external -extldflags -static"
+
+RUN mkdir -p /root/.ssh && \
+    chmod 0700 /root/.ssh && \
+    ssh-keyscan bitbucket.org > /root/.ssh/known_hosts && \
+    echo "${SSH_KEY}" > /root/.ssh/id_rsa && \
+    chmod 600 /root/.ssh/id_rsa && \
+    git config --global url."git@bitbucket.org:".insteadOf "https://bitbucket.org/" && \
+    GOOS=linux go build -a -installsuffix cgo -ldflags "-linkmode external -extldflags -static"
 
 FROM scratch
 EXPOSE 3000
-COPY --from=builder /go-modules/app .
-ENTRYPOINT ['/app']
+COPY --from=builder /go-modules/go-ibft /go-ibft
+ENTRYPOINT ["/go-ibft"]
 

@@ -1,9 +1,9 @@
 package network
 
 import (
-	"github.com/Lywel/go-gossipnet"
-	"github.com/Lywel/go-ibft/consensus"
-	"github.com/Lywel/go-ibft/events"
+	"bitbucket.org/ventureslash/go-gossipnet"
+	"bitbucket.org/ventureslash/go-ibft/consensus"
+	"bitbucket.org/ventureslash/go-ibft/events"
 	"github.com/ethereum/go-ethereum/rlp"
 	"log"
 )

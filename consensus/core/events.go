@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/Lywel/go-ibft/consensus"
+	"bitbucket.org/ventureslash/go-ibft/consensus"
 )
 
 // RequestEvent is emitted for a proposal to be handled

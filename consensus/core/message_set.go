@@ -4,7 +4,7 @@ import (
 	"math/big"
 	"sync"
 
-	"github.com/Lywel/go-ibft/consensus"
+	"bitbucket.org/ventureslash/go-ibft/consensus"
 )
 
 // map messages to validator address

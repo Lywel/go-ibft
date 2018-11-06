@@ -1,5 +1,7 @@
-github.com/Lywel/go-gossipnet v0.0.0-20181026031412-bdcfc7f3099d h1:A9WxqpxGedNjCHW2nYdCwO4Dm+F8McZAUCQiSKHsXYk=
-github.com/Lywel/go-gossipnet v0.0.0-20181026031412-bdcfc7f3099d/go.mod h1:IwjMT5ICSFQ5I7VI6NK8esIL6W7piUxTXcKmWESvm4g=
+bitbucket.org/ventureslash/go-gossipnet v0.0.0-20181105102413-116e7ff402d4 h1:ZnJ92y2PukyCm5URznfekMqjE7F48ONKkVq7CEkfv+g=
+bitbucket.org/ventureslash/go-gossipnet v0.0.0-20181105102413-116e7ff402d4/go.mod h1:cirE4mXnWYRSNYXMfjTN0OYrPNhysesEGzwWBlroD/I=
+bitbucket.org/ventureslash/go-gossipnet v0.1.0 h1:hMCqQzMJLcVa8SCRVi9mf+FpQ7BHV8wKngN9IhDK+sg=
+bitbucket.org/ventureslash/go-gossipnet v0.1.0/go.mod h1:cirE4mXnWYRSNYXMfjTN0OYrPNhysesEGzwWBlroD/I=
 github.com/btcsuite/btcd v0.0.0-20181013004428-67e573d211ac h1:/zx+Hglw2JN/pwVam1Z8cTCTl4pWyrbvOn2oooqCQSs=
 github.com/btcsuite/btcd v0.0.0-20181013004428-67e573d211ac/go.mod h1:Dmm/EzmjnCiweXmzRIAiUWCInVmPgjkzgv5k4tVyXiQ=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
