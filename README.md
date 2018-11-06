@@ -11,6 +11,7 @@ for you. This is a multi-step docker build, your private key is exclusively used
 by the builder container and will *not* be included in the final one.
 
 ___
+
 #### Add SSH Key in BitBucket
 
 ```sh
@@ -32,9 +33,10 @@ pbcopy < ~/.ssh/id_rsa.pub
 ```
 
 Then go to your account setting
-- <a href="https://bitbucket.org/account" target="_blank" title="Account Setting">Account Setting</a>
-- **SSH keys**
-- **Add key**
+
+- [Account Setting](https://bitbucket.org/account)
+- SSH keys
+- Add key
 
 ___
 
