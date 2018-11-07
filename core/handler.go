@@ -1,8 +1,7 @@
 package core
 
 import (
-	"bitbucket.org/ventureslash/go-ibft/consensus"
-	"bitbucket.org/ventureslash/go-ibft/consensus/backend/network"
+	"bitbucket.org/ventureslash/go-ibft"
 )
 
 func (c *core) handleEvents() {
@@ -13,7 +12,7 @@ func (c *core) handleEvents() {
 		case network.MessageEvent:
 			c.handleMsg(ev.Payload)
 		case RequestEvent:
-			r := &consensus.Request{
+			r := &ibft.Request{
 				Proposal: ev.Proposal,
 			}
 			err := c.checkRequest(r)
@@ -56,7 +55,7 @@ func (c *core) handleMsg(payload []byte) error {
 }
 
 // handles the message, and stores it in backlog if needed
-func (c *core) handleCheckedMsg(msg *message, src *consensus.Validator) error {
+func (c *core) handleCheckedMsg(msg *message, src *ibft.Validator) error {
 
 	// add message in backlog if it is a future message
 	testBacklog := func(err error) error {

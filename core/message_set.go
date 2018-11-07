@@ -1,37 +1,36 @@
 package core
 
 import (
+	"bitbucket.org/ventureslash/go-ibft"
 	"math/big"
 	"sync"
-
-	"bitbucket.org/ventureslash/go-ibft/consensus"
 )
 
 // map messages to validator address
 type messageSet struct {
-	view       *consensus.View
-	valSet     *consensus.ValidatorSet
+	view       *ibft.View
+	valSet     *ibft.ValidatorSet
 	messagesMu *sync.Mutex
-	messages   map[consensus.Address]*message
+	messages   map[ibft.Address]*message
 }
 
 // newMessageSet construct a new message set to accumulate messages for given
 // sequence/view number.
-func newMessageSet(valSet *consensus.ValidatorSet) *messageSet {
+func newMessageSet(valSet *ibft.ValidatorSet) *messageSet {
 	msgSet := &messageSet{
-		view: &consensus.View{
+		view: &ibft.View{
 			Round:    new(big.Int),
 			Sequence: new(big.Int),
 		},
 		messagesMu: new(sync.Mutex),
-		messages:   make(map[consensus.Address]*message),
+		messages:   make(map[ibft.Address]*message),
 		valSet:     valSet,
 	}
 	return msgSet
 }
 
 // View returns the current view
-func (ms *messageSet) View() *consensus.View {
+func (ms *messageSet) View() *ibft.View {
 	return ms.view
 }
 
@@ -54,7 +53,7 @@ func (ms *messageSet) Size() int {
 }
 
 // Get the message from an address
-func (ms *messageSet) Get(addr consensus.Address) *message {
+func (ms *messageSet) Get(addr ibft.Address) *message {
 	ms.messagesMu.Lock()
 	defer ms.messagesMu.Unlock()
 	return ms.messages[addr]

@@ -1,7 +1,7 @@
 package core
 
 import (
-	"bitbucket.org/ventureslash/go-ibft/consensus"
+	"bitbucket.org/ventureslash/go-ibft"
 	"gopkg.in/karalabe/cookiejar.v2/collections/prque"
 )
 
@@ -13,7 +13,7 @@ var (
 	}
 )
 
-func (c *core) storeBacklog(msg *message, src *consensus.Validator) {
+func (c *core) storeBacklog(msg *message, src *ibft.Validator) {
 	if src.Address() == c.address {
 		return
 	}
@@ -26,13 +26,13 @@ func (c *core) storeBacklog(msg *message, src *consensus.Validator) {
 	}
 	switch msg.Type {
 	case typePreprepare:
-		var preprepare *consensus.Preprepare
+		var preprepare *ibft.Preprepare
 		err := msg.Decode(&preprepare)
 		if err == nil {
 			backlog.Push(msg, toPriority(typePrepare, preprepare.View))
 		}
 	default:
-		var subject *consensus.Subject
+		var subject *ibft.Subject
 		err := msg.Decode(&subject)
 		if err == nil {
 			backlog.Push(msg, toPriority(typePrepare, subject.View))
@@ -60,16 +60,16 @@ func (c *core) processBacklogs() {
 				c.logger.Log("failed to cast message from backlog")
 				break
 			}
-			var view *consensus.View
+			var view *ibft.View
 			switch msg.Type {
 			case typePrepare:
-				var preprepare *consensus.Preprepare
+				var preprepare *ibft.Preprepare
 				err := msg.Decode(&preprepare)
 				if err == nil {
 					view = preprepare.View
 				}
 			default:
-				var subject consensus.Subject
+				var subject ibft.Subject
 				err := msg.Decode(&subject)
 				if err == nil {
 					view = subject.View
@@ -93,7 +93,7 @@ func (c *core) processBacklogs() {
 	}
 }
 
-func toPriority(msgType uint64, view *consensus.View) float32 {
+func toPriority(msgType uint64, view *ibft.View) float32 {
 	if msgType == typeRoundChange {
 		// For msgRoundChange, set the message priority based on its sequence
 		return -float32(view.Sequence.Uint64() * 1000)

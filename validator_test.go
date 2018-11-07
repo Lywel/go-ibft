@@ -1,14 +1,16 @@
-package consensus
+package ibft
 
 import (
 	"testing"
 )
 
-var (a, b, c, d, e Address = [20]byte{0, 1 , 2}, [20]byte{0, 1 , 2, 4}, [20]byte{0, 1 , 2, 5}, [20]byte{0, 1 , 3}, [20]byte{0, 1 , 2})
+var (
+	a, b, c, d, e Address = [20]byte{0, 1, 2}, [20]byte{0, 1, 2, 4}, [20]byte{0, 1, 2, 5}, [20]byte{0, 1, 3}, [20]byte{0, 1, 2}
+)
 
 func TestValidator(t *testing.T) {
 	v := NewValidator(a)
-	if (v.Address() != a) {
+	if v.Address() != a {
 		t.Errorf("address mismatch: expected %v, got %v", a.String(), v.String())
 		t.FailNow()
 	}

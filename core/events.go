@@ -1,12 +1,12 @@
 package core
 
 import (
-	"bitbucket.org/ventureslash/go-ibft/consensus"
+	"bitbucket.org/ventureslash/go-ibft"
 )
 
 // RequestEvent is emitted for a proposal to be handled
 type RequestEvent struct {
-	Proposal consensus.Proposal
+	Proposal ibft.Proposal
 }
 
 // BacklogEvent is an internal event used to store an event for latter processing
@@ -16,6 +16,6 @@ type BacklogEvent struct {
 
 // StateEvent is emmitted when a peer joins the network
 type StateEvent struct {
-	valSet consensus.ValidatorSet
+	valSet ibft.ValidatorSet
 	state  State
 }

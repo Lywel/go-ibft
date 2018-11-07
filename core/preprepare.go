@@ -1,13 +1,13 @@
 package core
 
 import (
-	"bitbucket.org/ventureslash/go-ibft/consensus"
+	"bitbucket.org/ventureslash/go-ibft"
 )
 
-func (c *core) sendPreprepare(request *consensus.Request) {
+func (c *core) sendPreprepare(request *ibft.Request) {
 	if request.Proposal.Number().Cmp(c.current.sequence) == 0 && c.isProposer() {
 		c.logger.Log("Send preprepare")
-		preprepare, err := Encode(&consensus.Preprepare{
+		preprepare, err := Encode(&ibft.Preprepare{
 			View:     c.currentView(),
 			Proposal: request.Proposal,
 		})
@@ -22,9 +22,9 @@ func (c *core) sendPreprepare(request *consensus.Request) {
 	}
 }
 
-func (c *core) handlePreprepare(msg *message, src *consensus.Validator) error {
+func (c *core) handlePreprepare(msg *message, src *ibft.Validator) error {
 	c.logger.Log("Handle preprepare from", src.String())
-	var preprepare *consensus.Preprepare
+	var preprepare *ibft.Preprepare
 
 	// Decode msg.Msg and fill preprepare
 	err := msg.Decode(&preprepare)

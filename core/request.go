@@ -1,10 +1,10 @@
 package core
 
 import (
-	"bitbucket.org/ventureslash/go-ibft/consensus"
+	"bitbucket.org/ventureslash/go-ibft"
 )
 
-func (c *core) handleRequest(request *consensus.Request) error {
+func (c *core) handleRequest(request *ibft.Request) error {
 	if err := c.checkRequest(request); err != nil {
 		if err == errInvalidMessage {
 			c.logger.Log("invalid message")
@@ -23,7 +23,7 @@ func (c *core) handleRequest(request *consensus.Request) error {
 	return nil
 }
 
-func (c *core) checkRequest(request *consensus.Request) error {
+func (c *core) checkRequest(request *ibft.Request) error {
 	if request == nil || request.Proposal == nil {
 		return errInvalidMessage
 	}
@@ -36,7 +36,7 @@ func (c *core) checkRequest(request *consensus.Request) error {
 	return nil
 }
 
-func (c *core) storeRequest(request *consensus.Request) {
+func (c *core) storeRequest(request *ibft.Request) {
 	c.logger.Log("storing future request", "number", request.Proposal.Number(),
 		"Hash", request.Proposal.Hash())
 	c.pendingRequestsMu.Lock()
@@ -50,7 +50,7 @@ func (c *core) processPendingRequests() {
 
 	for !c.pendingRequests.Empty() {
 		m, prio := c.pendingRequests.Pop()
-		r, ok := m.(*consensus.Request)
+		r, ok := m.(*ibft.Request)
 
 		if !ok {
 			c.logger.Log("request malformed")

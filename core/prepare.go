@@ -1,9 +1,8 @@
 package core
 
 import (
+	"bitbucket.org/ventureslash/go-ibft"
 	"reflect"
-
-	"bitbucket.org/ventureslash/go-ibft/consensus"
 )
 
 func (c *core) sendPrepare() {
@@ -20,9 +19,9 @@ func (c *core) sendPrepare() {
 	})
 }
 
-func (c *core) handlePrepare(msg *message, src *consensus.Validator) error {
+func (c *core) handlePrepare(msg *message, src *ibft.Validator) error {
 	c.logger.Log("handle prepare from", src.String())
-	var prepare *consensus.Subject
+	var prepare *ibft.Subject
 	err := msg.Decode(&prepare)
 	if err != nil {
 		return errFailedDecodePrepare
@@ -46,7 +45,7 @@ func (c *core) handlePrepare(msg *message, src *consensus.Validator) error {
 	return nil
 }
 
-func (c *core) verifyPrepare(prepare *consensus.Subject) error {
+func (c *core) verifyPrepare(prepare *ibft.Subject) error {
 	subject := c.current.Subject()
 	if !reflect.DeepEqual(prepare, subject) {
 		c.logger.Log("subjects do not match: expected", subject, "got", prepare)

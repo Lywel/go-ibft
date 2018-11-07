@@ -1,7 +1,7 @@
 package core
 
 import (
-	"bitbucket.org/ventureslash/go-ibft/consensus"
+	"bitbucket.org/ventureslash/go-ibft"
 	"reflect"
 )
 
@@ -19,9 +19,9 @@ func (c *core) sendCommit() {
 	})
 }
 
-func (c *core) handleCommit(msg *message, src *consensus.Validator) error {
+func (c *core) handleCommit(msg *message, src *ibft.Validator) error {
 	c.logger.Log("Handle commit from", src)
-	var commit *consensus.Subject
+	var commit *ibft.Subject
 	err := msg.Decode(&commit)
 	if err != nil {
 		return errFailedDecodeCommit
@@ -41,7 +41,7 @@ func (c *core) handleCommit(msg *message, src *consensus.Validator) error {
 	return nil
 }
 
-func (c *core) verifyCommit(commit *consensus.Subject) error {
+func (c *core) verifyCommit(commit *ibft.Subject) error {
 	subject := c.current.Subject()
 	if !reflect.DeepEqual(commit, subject) {
 		c.logger.Log("subjects do not match: expected", subject, "got", commit)

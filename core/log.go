@@ -1,14 +1,13 @@
 package core
 
 import (
+	"bitbucket.org/ventureslash/go-ibft"
 	"fmt"
-
-	"bitbucket.org/ventureslash/go-ibft/consensus"
 )
 
 // Logger helps printing clears logs
 type Logger struct {
-	address consensus.Address
+	address ibft.Address
 }
 
 // Log prints the message with the address at the beginning

@@ -1,26 +1,25 @@
 package core
 
 import (
+	"bitbucket.org/ventureslash/go-ibft"
 	"math/big"
 	"sync"
-
-	"bitbucket.org/ventureslash/go-ibft/consensus"
 )
 
 // roundState stores the consensus state
 type roundState struct {
 	round          *big.Int
 	sequence       *big.Int
-	Preprepare     *consensus.Preprepare
+	Preprepare     *ibft.Preprepare
 	Prepares       *messageSet
 	Commits        *messageSet
-	pendingRequest *consensus.Request
+	pendingRequest *ibft.Request
 	mu             *sync.RWMutex
 }
 
 // newRoundState creates a new roundState instance with the given view and validatorSet
-func newRoundState(view *consensus.View, preprepare *consensus.Preprepare,
-	valSet *consensus.ValidatorSet, request *consensus.Request) *roundState {
+func newRoundState(view *ibft.View, preprepare *ibft.Preprepare,
+	valSet *ibft.ValidatorSet, request *ibft.Request) *roundState {
 	return &roundState{
 		round:          view.Round,
 		sequence:       view.Sequence,
@@ -33,9 +32,9 @@ func newRoundState(view *consensus.View, preprepare *consensus.Preprepare,
 }
 
 // Subject returns the subject of the current round
-func (s *roundState) Subject() *consensus.Subject {
-	return &consensus.Subject{
-		View: &consensus.View{
+func (s *roundState) Subject() *ibft.Subject {
+	return &ibft.Subject{
+		View: &ibft.View{
 			Round:    new(big.Int).Set(s.round),
 			Sequence: new(big.Int).Set(s.sequence),
 		},

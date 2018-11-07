@@ -1,17 +1,16 @@
 package core
 
 import (
-	"testing"
-
 	"bitbucket.org/ventureslash/go-ibft/consensus"
+	"testing"
 )
 
 var (
-	a, b, c, d consensus.Address = [20]byte{0, 1, 2}, [20]byte{0, 1, 2, 4}, [20]byte{0, 1, 2, 5}, [20]byte{0, 1, 3}
+	a, b, c, d ibft.Address = [20]byte{0, 1, 2}, [20]byte{0, 1, 2, 4}, [20]byte{0, 1, 2, 5}, [20]byte{0, 1, 3}
 )
 
 func TestNewMessageSet(t *testing.T) {
-	valSet := consensus.NewSet([]consensus.Address{a, b, c})
+	valSet := ibft.NewSet([]ibft.Address{a, b, c})
 	msgSet := newMessageSet(valSet)
 	ms := &message{
 		Address: a,

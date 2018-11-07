@@ -1,7 +1,7 @@
 package core
 
 import (
-	"bitbucket.org/ventureslash/go-ibft/consensus"
+	"bitbucket.org/ventureslash/go-ibft"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -54,11 +54,11 @@ const (
 type message struct {
 	Type      int
 	Msg       []byte
-	Address   consensus.Address
+	Address   ibft.Address
 	Signature []byte
 }
 
-func (m *message) FromPayload(b []byte, validateFn func([]byte, []byte) (consensus.Address, error)) error {
+func (m *message) FromPayload(b []byte, validateFn func([]byte, []byte) (ibft.Address, error)) error {
 	if err := rlp.DecodeBytes(b, &m); err != nil {
 		return err
 	}
