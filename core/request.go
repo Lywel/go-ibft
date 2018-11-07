@@ -70,8 +70,8 @@ func (c *core) processPendingRequests() {
 		c.logger.Log("processing pending request", "number", r.Proposal.Number(),
 			"Hash", r.Proposal.Hash())
 
-		c.events.Push(RequestEvent{
+		c.eventsIn <- RequestEvent{
 			Proposal: r.Proposal,
-		})
+		}
 	}
 }

@@ -2,6 +2,7 @@ package core
 
 import (
 	"bitbucket.org/ventureslash/go-ibft"
+	"crypto/ecdsa"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -42,6 +43,16 @@ func (s State) String() string {
 	} else {
 		return "Unknown"
 	}
+}
+
+// backend interface is used to validate proposale and manage state
+type backend interface {
+	PrivateKey() *ecdsa.PrivateKey
+	EventsInChan() chan Event
+	EventsOutChan() chan Event
+	DecodeProposal(data []byte) ibft.Proposal
+	Verify(proposal ibft.Proposal) error
+	Commit(proposal ibft.Proposal) error
 }
 
 const (

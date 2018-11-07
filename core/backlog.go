@@ -85,9 +85,9 @@ func (c *core) processBacklogs() {
 				c.logger.Log("stop processing invalid backlog", "msg", msg)
 				continue
 			}
-			c.events.Push(BacklogEvent{
+			c.eventsIn <- BacklogEvent{
 				Message: msg,
-			})
+			}
 		}
 
 	}

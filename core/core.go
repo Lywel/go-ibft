@@ -2,7 +2,8 @@ package core
 
 import (
 	"bitbucket.org/ventureslash/go-ibft"
-	"bitbucket.org/ventureslash/go-ibft/events"
+	"bitbucket.org/ventureslash/go-ibft/crypto"
+	"crypto/ecdsa"
 	eth "github.com/ethereum/go-ethereum/crypto"
 	"gopkg.in/karalabe/cookiejar.v2/collections/prque"
 	"math/big"
@@ -11,12 +12,13 @@ import (
 
 type core struct {
 	address               ibft.Address
-	backend               ibft.Backend
+	privateKey            *ecdsa.PrivateKey
+	backend               backend
 	state                 State
 	valSet                *ibft.ValidatorSet
 	current               *roundState
-	events                events.Handler
-	networkManager        network.Manager
+	eventsIn              chan Event
+	eventsOut             chan Event
 	pendingRequests       *prque.Prque
 	pendingRequestsMu     *sync.Mutex
 	backlogs              map[*ibft.Validator]*prque.Prque
@@ -27,33 +29,32 @@ type core struct {
 }
 
 // New initialize a new core
-func New(backend ibft.Backend) ibft.Engine {
-	eventHandler := events.New()
-	networkManager := network.New(backend.Network(), eventHandler)
+func New(b backend) ibft.Engine {
+	//networkManager := network.New(backend.Network(), eventHandler)
+	address := crypto.PubkeyToAddress(b.PrivateKey().PublicKey)
 	view := &ibft.View{
 		Round:    big.NewInt(0),
 		Sequence: big.NewInt(0),
 	}
 	return &core{
-		state: StateAcceptRequest,
-		logger: &Logger{
-			address: backend.Address(),
-		},
-		backend:           backend,
+		address:           address,
+		privateKey:        b.PrivateKey(),
+		state:             StateAcceptRequest,
+		logger:            &Logger{address: address},
+		backend:           b,
 		pendingRequests:   prque.New(),
 		pendingRequestsMu: &sync.Mutex{},
 		backlogsMu:        &sync.Mutex{},
 		backlogs:          make(map[*ibft.Validator]*prque.Prque),
-		events:            eventHandler,
-		networkManager:    networkManager,
-		current:           newRoundState(view, nil, ibft.NewSet([]ibft.Address{backend.Address()}), nil),
-		valSet:            ibft.NewSet([]ibft.Address{backend.Address()}),
+		eventsIn:          b.EventsInChan(),
+		eventsOut:         b.EventsOutChan(),
+		current:           newRoundState(view, nil, ibft.NewSet([]ibft.Address{address}), nil),
+		valSet:            ibft.NewSet([]ibft.Address{address}),
 	}
 }
 
 // Start implements core.Start
 func (c *core) Start() {
-	c.networkManager.Start(c.backend.Address())
 	c.startNewRound(ibft.Big0)
 	c.logger.Log("Core started")
 	go c.handleEvents()
@@ -91,7 +92,7 @@ func (c *core) finalizeMessage(msg *message) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	msg.Signature, err = c.backend.Sign(data)
+	msg.Signature, err = c.sign(data)
 	if err != nil {
 		return nil, err
 	}
@@ -109,9 +110,8 @@ func (c *core) broadcast(msg *message) {
 		c.logger.Log("failed to finalize message", "msg", msg, "err", err)
 		return
 	}
-	if err := c.networkManager.Broadcast(payload); err != nil {
-		c.logger.Log("failed to broadcast message", "msg", msg, "err", err)
-	}
+	// Broadcast
+	c.eventsOut <- payload
 }
 
 func (c *core) verify(p ibft.Proposal) error {
@@ -221,4 +221,8 @@ func (c *core) ValidateFn(data []byte, sig []byte) (ibft.Address, error) {
 		return address, errUnauthorized
 	}
 	return address, nil
+}
+
+func (c *core) sign(data []byte) ([]byte, error) {
+	return crypto.Sign(data, c.privateKey)
 }

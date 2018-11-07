@@ -3,10 +3,8 @@ package ibft
 import (
 	"crypto/ecdsa"
 	"encoding/hex"
-	"math/big"
-
-	"bitbucket.org/ventureslash/go-gossipnet"
 	"github.com/ethereum/go-ethereum/crypto"
+	"math/big"
 )
 
 const (
@@ -22,15 +20,6 @@ var (
 type Engine interface {
 	Start()
 	Stop()
-}
-
-type Backend interface {
-	Start()
-	Stop()
-	Network() *gossipnet.Node
-	Address() Address
-	Sign(data []byte) ([]byte, error)
-	AddValidator(addr Address) bool
 }
 
 // Address of client

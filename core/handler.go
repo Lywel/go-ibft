@@ -7,9 +7,9 @@ import (
 func (c *core) handleEvents() {
 	c.wg.Add(1)
 	defer c.wg.Done()
-	for event := range c.events.EventChan() {
+	for event := range c.eventsIn {
 		switch ev := event.(type) {
-		case network.MessageEvent:
+		case MessageEvent:
 			c.handleMsg(ev.Payload)
 		case RequestEvent:
 			r := &ibft.Request{
@@ -24,9 +24,9 @@ func (c *core) handleEvents() {
 		case BacklogEvent:
 			_, src := c.valSet.GetByAddress(ev.Message.Address)
 			c.handleCheckedMsg(ev.Message, src)
-		case network.JoinEvent:
+		case JoinEvent:
 			c.logger.Log("New peer:", ev.Address)
-			c.backend.AddValidator(ev.Address)
+			// add validator
 			if c.isProposer() {
 				// TODO:
 				//  - gather data new peer needs (state, addresses, sequence, ...)
