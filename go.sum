@@ -1,15 +1,9 @@
-bitbucket.org/ventureslash/go-gossipnet v0.0.0-20181105102413-116e7ff402d4 h1:ZnJ92y2PukyCm5URznfekMqjE7F48ONKkVq7CEkfv+g=
-bitbucket.org/ventureslash/go-gossipnet v0.0.0-20181105102413-116e7ff402d4/go.mod h1:cirE4mXnWYRSNYXMfjTN0OYrPNhysesEGzwWBlroD/I=
-bitbucket.org/ventureslash/go-gossipnet v0.1.0 h1:hMCqQzMJLcVa8SCRVi9mf+FpQ7BHV8wKngN9IhDK+sg=
-bitbucket.org/ventureslash/go-gossipnet v0.1.0/go.mod h1:cirE4mXnWYRSNYXMfjTN0OYrPNhysesEGzwWBlroD/I=
 github.com/btcsuite/btcd v0.0.0-20181013004428-67e573d211ac h1:/zx+Hglw2JN/pwVam1Z8cTCTl4pWyrbvOn2oooqCQSs=
 github.com/btcsuite/btcd v0.0.0-20181013004428-67e573d211ac/go.mod h1:Dmm/EzmjnCiweXmzRIAiUWCInVmPgjkzgv5k4tVyXiQ=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/ethereum/go-ethereum v1.8.17 h1:aoqWfGFYsSxCdFZfQ6h0pnojtoBOcYI+6Yg8JXhGuXs=
 github.com/ethereum/go-ethereum v1.8.17/go.mod h1:PwpWDrCLZrV+tfrhqqF6kPknbISMHaJv9Ln3kPCZLwY=
-github.com/hashicorp/golang-lru v0.5.0 h1:CL2msUPvZTLb5O648aiLNJw3hnBxN2+1Jq8rCOH9wdo=
-github.com/hashicorp/golang-lru v0.5.0/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
 github.com/kr/pretty v0.1.0 h1:L/CwN0zerZDmRFUapSPitk6f+Q3+0za1rQkzVuMiMFI=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=

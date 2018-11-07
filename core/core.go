@@ -111,7 +111,7 @@ func (c *core) broadcast(msg *message) {
 		return
 	}
 	// Broadcast
-	c.eventsOut <- payload
+	c.eventsOut <- MessageEvent{Payload: payload}
 }
 
 func (c *core) verify(p ibft.Proposal) error {
