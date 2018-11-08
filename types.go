@@ -102,21 +102,9 @@ func (b *Preprepare) EncodeRLP(w io.Writer) error {
 
 // DecodeRLP implements rlp.Decoder, and load the consensus fields from a RLP stream.
 func (b *PreprepareRaw) DecodeRLP(s *rlp.Stream) error {
-	var preprepareRaw *PreprepareRaw
-	if err := s.Decode(&preprepareRaw); err != nil {
+	if err := s.Decode(b); err != nil {
 		return err
 	}
-	// TODO call decodeProposal
-	/*var preprepare struct {
-		View     *View
-		Proposal *types.Block
-	}
-
-	if err := s.Decode(&preprepare); err != nil {
-		return err
-	}
-	b.View, b.Proposal = preprepare.View, preprepare.Proposal*/
-
 	return nil
 }
 
