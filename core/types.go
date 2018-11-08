@@ -1,13 +1,14 @@
 package core
 
 import (
-	"bitbucket.org/ventureslash/go-ibft"
 	"crypto/ecdsa"
+
+	"bitbucket.org/ventureslash/go-ibft"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
 // State is an enum representing the current state
-type State uint
+type State uint64
 
 // State* are core states
 const (
@@ -63,7 +64,7 @@ const (
 )
 
 type message struct {
-	Type      int
+	Type      uint64
 	Msg       []byte
 	Address   ibft.Address
 	Signature []byte

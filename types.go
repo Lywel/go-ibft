@@ -3,8 +3,11 @@ package ibft
 import (
 	"crypto/ecdsa"
 	"encoding/hex"
-	"github.com/ethereum/go-ethereum/crypto"
+	"io"
 	"math/big"
+
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/rlp"
 )
 
 const (
@@ -54,6 +57,8 @@ type Proposal interface {
 	Number() *big.Int
 	Hash() []byte
 	String() string
+	EncodeRLP(w io.Writer) error
+	DecodeRLP(s *rlp.Stream) error
 }
 
 // Request is the original request of the client
@@ -80,12 +85,10 @@ func (v *View) Cmp(y *View) int {
 	return 0
 }
 
-
 type PreprepareRaw struct {
-	View *View
+	View     *View
 	Proposal []interface{} `rlp:"tail"`
 }
-
 
 // Preprepare include the proposal and the current view
 type Preprepare struct {
@@ -99,7 +102,6 @@ func (b *Preprepare) EncodeRLP(w io.Writer) error {
 
 // DecodeRLP implements rlp.Decoder, and load the consensus fields from a RLP stream.
 func (b *PreprepareRaw) DecodeRLP(s *rlp.Stream) error {
-
 	var preprepareRaw *PreprepareRaw
 	if err := s.Decode(&preprepareRaw); err != nil {
 		return err
@@ -122,4 +124,23 @@ func (b *PreprepareRaw) DecodeRLP(s *rlp.Stream) error {
 type Subject struct {
 	View   *View
 	Digest []byte
+}
+
+// EncodeRLP serializes b into the Ethereum RLP format.
+func (b *Subject) EncodeRLP(w io.Writer) error {
+	return rlp.Encode(w, []interface{}{b.View, b.Digest})
+}
+
+// DecodeRLP implements rlp.Decoder, and load the consensus fields from a RLP stream.
+func (b *Subject) DecodeRLP(s *rlp.Stream) error {
+	var subject struct {
+		View   *View
+		Digest []byte
+	}
+
+	if err := s.Decode(&subject); err != nil {
+		return err
+	}
+	b.View, b.Digest = subject.View, subject.Digest
+	return nil
 }

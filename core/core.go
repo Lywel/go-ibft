@@ -1,13 +1,14 @@
 package core
 
 import (
-	"bitbucket.org/ventureslash/go-ibft"
-	"bitbucket.org/ventureslash/go-ibft/crypto"
 	"crypto/ecdsa"
-	eth "github.com/ethereum/go-ethereum/crypto"
-	"gopkg.in/karalabe/cookiejar.v2/collections/prque"
 	"math/big"
 	"sync"
+
+	"bitbucket.org/ventureslash/go-ibft"
+	"bitbucket.org/ventureslash/go-ibft/crypto"
+	eth "github.com/ethereum/go-ethereum/crypto"
+	"gopkg.in/karalabe/cookiejar.v2/collections/prque"
 )
 
 type core struct {
@@ -118,7 +119,7 @@ func (c *core) verify(p ibft.Proposal) error {
 	return nil
 }
 
-func (c *core) checkMessage(msgType int, view *ibft.View) error {
+func (c *core) checkMessage(msgType uint64, view *ibft.View) error {
 	if view == nil || view.Sequence == nil || view.Round == nil {
 		return errInvalidMessage
 	}
