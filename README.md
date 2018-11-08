@@ -3,6 +3,8 @@ This project is heavily inpired from the [Quorum](https://github.com/jpmorgancha
 fork of ethereum. It aims at implementing the IBFT algoithm in golang without
 the etherneum dependancy.
 
+__
+
 ### Build the container
 Some depandencies of this go-module are hosted on private repositories. You
 *must* to be a collaborator in order to build it. Use one of your bitbucket
@@ -10,35 +12,24 @@ registered SSH keys as an argument in order to let Docker build the container
 for you. This is a multi-step docker build, your private key is exclusively used
 by the builder container and will *not* be included in the final one.
 
-___
-
 #### Add SSH Key in BitBucket
 
 ```sh
 # Add the key to the ssh-agent if you don't want to type password each time you use the key
-# If you are on MacOS
-# ssh-add -K ~/.ssh/<private_key_file>
+# ssh-add -K <private_key_path>
 ssh-add -K ~/.ssh/id_rsa
-
-# If you are on Linux
-# ssh-add ~/.ssh/id_rsa
 
 # Copy your ssh public key to clipboard
 # If you are on MacOS
-# pbcopy < ~/.ssh/<public_key_file>
-pbcopy < ~/.ssh/id_rsa.pub
-
-# If you are on Linux
-# cat ~/.ssh/id_rsa.pub
+# pbcopy < <private_key_path>.pub
+cat ~/.ssh/id_rsa.pub
 ```
 
-Then go to your account setting
+Then go to your [Account Setting](https://bitbucket.org/account) > SSH keys
+> Add key. And paste the public key you copied previously. Now you can use ssh
+to clone repositories without typing a password.
 
-- [Account Setting](https://bitbucket.org/account)
-- SSH keys
-- Add key
-
-___
+[Read more](https://confluence.atlassian.com/bitbucketserver/using-ssh-keys-to-secure-git-operations-776639772.html) about ssh configuration on bitbucket.
 
 #### Docker Build
 
@@ -55,6 +46,8 @@ docker images slash/go-ibft
 
 You should now have the `slash/go-ibft` image and thanks to golang self-containness
 it's less than 10MB in size.
+
+__
 
 ### Start an instance
 The container exposes port 8080. You can start as much instances on the same
