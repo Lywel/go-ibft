@@ -50,7 +50,7 @@ type backend interface {
 	PrivateKey() *ecdsa.PrivateKey
 	EventsInChan() chan Event
 	EventsOutChan() chan Event
-	DecodeProposal(data []byte) ibft.Proposal
+	DecodeProposal(prop interface{}) (ibft.Proposal, error)
 	Verify(proposal ibft.Proposal) error
 	Commit(proposal ibft.Proposal) error
 }
