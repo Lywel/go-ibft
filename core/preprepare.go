@@ -24,13 +24,22 @@ func (c *core) sendPreprepare(request *ibft.Request) {
 
 func (c *core) handlePreprepare(msg *message, src *ibft.Validator) error {
 	c.logger.Log("Handle preprepare from", src.String())
-	var preprepare *ibft.Preprepare
 
-	// Decode msg.Msg and fill preprepare
-	err := msg.Decode(&preprepare)
+	var preprepareRaw *PreprepareRaw
+
+	msg.Decode(&preprepareRaw)
+
+	proposal, err := c.backend.DecodeProposal(preprepareRaw.Proposal[0])
+
 	if err != nil {
 		return errFailedDecodePreprepare
 	}
+
+	var preprepare = &preprepare{
+		View: preprepareRaw.View,
+		Proposal: proposal
+	}
+
 	if err := c.checkMessage(typePreprepare, preprepare.View); err != nil {
 		c.logger.Log("check message failed")
 		return err

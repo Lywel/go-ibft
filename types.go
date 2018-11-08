@@ -80,10 +80,42 @@ func (v *View) Cmp(y *View) int {
 	return 0
 }
 
+
+type PreprepareRaw struct {
+	View *View
+	Proposal []interface{} `rlp:"tail"`
+}
+
+
 // Preprepare include the proposal and the current view
 type Preprepare struct {
 	View     *View
 	Proposal Proposal
+}
+
+func (b *Preprepare) EncodeRLP(w io.Writer) error {
+	return rlp.Encode(w, []interface{}{b.View, b.Proposal})
+}
+
+// DecodeRLP implements rlp.Decoder, and load the consensus fields from a RLP stream.
+func (b *PreprepareRaw) DecodeRLP(s *rlp.Stream) error {
+
+	var preprepareRaw *PreprepareRaw
+	if err := s.Decode(&preprepareRaw); err != nil {
+		return err
+	}
+	// TODO call decodeProposal
+	/*var preprepare struct {
+		View     *View
+		Proposal *types.Block
+	}
+
+	if err := s.Decode(&preprepare); err != nil {
+		return err
+	}
+	b.View, b.Proposal = preprepare.View, preprepare.Proposal*/
+
+	return nil
 }
 
 // Subject include the proposal digest and the current view
