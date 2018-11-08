@@ -20,6 +20,7 @@ func TestEncode(t *testing.T) {
 	if err != nil {
 		t.Errorf("failed encode preprepare")
 	}
+	t.Log(preprepare)
 }
 
 func TestDecodePrePrepare(t *testing.T) {

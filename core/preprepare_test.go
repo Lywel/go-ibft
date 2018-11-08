@@ -1,5 +1,13 @@
 package core
 
+import (
+	"math/big"
+	"sync"
+	"testing"
+
+	"bitbucket.org/ventureslash/go-ibft"
+	"gopkg.in/karalabe/cookiejar.v2/collections/prque"
+)
 
 func TestHandlePreprepare(t *testing.T) {
 	var a, b, c ibft.Address = [20]byte{0, 1, 2}, [20]byte{0, 1, 2, 4}, [20]byte{0, 1, 2, 5}
@@ -41,4 +49,3 @@ func TestHandlePreprepare(t *testing.T) {
 		t.Log(err)
 	}
 }
-
