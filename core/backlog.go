@@ -26,8 +26,19 @@ func (c *core) storeBacklog(msg *message, src *ibft.Validator) {
 	}
 	switch msg.Type {
 	case typePreprepare:
-		var preprepare *ibft.Preprepare
-		err := msg.Decode(&preprepare)
+
+		var encodedPreprepare *ibft.EncodedPreprepare
+		msg.Decode(&encodedPreprepare)
+
+		proposal, err := c.backend.DecodeProposal(encodedPreprepare.Prop)
+		if err != nil {
+			return
+		}
+
+		var preprepare = &ibft.Preprepare{
+			View:     encodedPreprepare.View,
+			Proposal: proposal,
+		}
 		if err == nil {
 			backlog.Push(msg, toPriority(typePrepare, preprepare.View))
 		}

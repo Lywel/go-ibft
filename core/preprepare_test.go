@@ -1,15 +1,63 @@
 package core
 
 import (
-	"math/big"
-	"sync"
+	"crypto/ecdsa"
+	"errors"
+	"reflect"
 	"testing"
 
 	"bitbucket.org/ventureslash/go-ibft"
-	"gopkg.in/karalabe/cookiejar.v2/collections/prque"
+	"github.com/ethereum/go-ethereum/rlp"
 )
 
+type backendTest struct{}
+
+func (b *backendTest) PrivateKey() *ecdsa.PrivateKey {
+	return nil
+}
+
+func (b *backendTest) Start() {}
+
+func (b *backendTest) Stop() {}
+
+// EventsInChan returns a channel receiving network events
+func (b *backendTest) EventsInChan() chan Event {
+	return nil
+}
+
+// EventsOutChan returns a channel used to emit events to the network
+func (b *backendTest) EventsOutChan() chan Event {
+	return nil
+}
+
+// DecodeProposal parses a payload and return a Proposal interface
+func (b *backendTest) DecodeProposal(prop *ibft.EncodedProposal) (ibft.Proposal, error) {
+	switch prop.Type {
+	case 1:
+		var b *blockTest
+		err := rlp.DecodeBytes(prop.Prop, &b)
+		if err != nil {
+			return nil, err
+		}
+		return b, nil
+		/*
+			case type.Transactiono:
+				return proposal
+		*/
+	default:
+		return nil, errors.New("Unknown proposal type " + reflect.ValueOf(prop).Elem().String())
+	}
+}
+
+// Verify returns an error is a proposal should be rejected
+func (b *backendTest) Verify(proposal ibft.Proposal) error { return nil }
+
+// Commit is called by an IBFT algorythm when a Proposal is accepted
+func (b *backendTest) Commit(proposal ibft.Proposal) error { return nil }
+
 func TestHandlePreprepare(t *testing.T) {
+	/*privkey, _ := ecdsa.GenerateKey(eth.S256(), rand.Reader)
+	backend := &backendTest{}
 	var a, b, c ibft.Address = [20]byte{0, 1, 2}, [20]byte{0, 1, 2, 4}, [20]byte{0, 1, 2, 5}
 	valSet := ibft.NewSet([]ibft.Address{a, b, c})
 	core := &core{
@@ -25,6 +73,8 @@ func TestHandlePreprepare(t *testing.T) {
 		logger: &Logger{
 			address: ibft.Address{0},
 		},
+		backend:    backend,
+		privateKey: privkey,
 	}
 
 	block := newBlockTest(ibft.Big1, "test")
@@ -47,5 +97,5 @@ func TestHandlePreprepare(t *testing.T) {
 	if err != nil {
 		t.Errorf("handle preprepare failed")
 		t.Log(err)
-	}
+	}*/
 }

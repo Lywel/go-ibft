@@ -25,6 +25,7 @@ func TestEncode(t *testing.T) {
 
 func TestDecodePrePrepare(t *testing.T) {
 	var a ibft.Address = [20]byte{0, 1, 2}
+	backend := &backendTest{}
 
 	block := newBlockTest(ibft.Big1, "test")
 
@@ -43,12 +44,18 @@ func TestDecodePrePrepare(t *testing.T) {
 		Msg:     pre,
 		Address: a,
 	}
-	var preprepare *ibft.Preprepare
+	var encodedPreprepare *ibft.EncodedPreprepare
+	ms.Decode(&encodedPreprepare)
 
-	err = ms.Decode(&preprepare)
+	proposal, err := backend.DecodeProposal(encodedPreprepare.Prop)
 	if err != nil {
-		t.Errorf("decode failed")
+		t.Errorf("decode proposal failed")
 		t.Log(err)
+	}
+	if proposal.String() != block.String() {
+		t.Errorf("proposal dont match")
+		t.Log("expected", block.String())
+		t.Log("got", proposal.String())
 	}
 }
 

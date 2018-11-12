@@ -5,6 +5,7 @@ import (
 	"io"
 	"math/big"
 
+	"bitbucket.org/ventureslash/go-ibft"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto/sha3"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -27,6 +28,15 @@ type extblockTest struct {
 	Number *big.Int
 	Data   string
 }
+
+type ProposalWrapper struct {
+	Type     uint
+	Proposal interface{}
+}
+
+const (
+	blockType uint = iota
+)
 
 func RlpHash(x interface{}) []byte {
 	var h common.Hash
@@ -51,9 +61,17 @@ func (b *blockTest) String() string {
 }
 
 func (b *blockTest) EncodeRLP(w io.Writer) error {
-	return rlp.Encode(w, extblockTest{
+	ext := extblockTest{
 		Number: b.number,
 		Data:   b.data,
+	}
+	propToBytes, err := rlp.EncodeToBytes(ext)
+	if err != nil {
+		return err
+	}
+	return rlp.Encode(w, ibft.EncodedProposal{
+		Type: 1,
+		Prop: propToBytes,
 	})
 }
 
