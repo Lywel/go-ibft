@@ -1,9 +1,10 @@
 package core
 
 import (
-	"bitbucket.org/ventureslash/go-ibft"
 	"math/big"
 	"sync"
+
+	"bitbucket.org/ventureslash/go-ibft"
 )
 
 // roundState stores the consensus state

@@ -1,11 +1,14 @@
 package ibft
 
 import (
+	"io"
 	"math"
 	"reflect"
 	"sort"
 	"strings"
 	"sync"
+
+	"github.com/ethereum/go-ethereum/rlp"
 )
 
 // Validator is a node of the consensus
@@ -134,3 +137,38 @@ func (valSet *ValidatorSet) IsProposer(addr Address) bool {
 
 // F gets the maximum number of faulty nodes
 func (valSet *ValidatorSet) F() int { return int(math.Ceil(float64(valSet.Size())/3)) - 1 }
+
+// Copy returns a copy of the validator set
+func (valSet *ValidatorSet) Copy() *ValidatorSet {
+	valSet.validatorMu.Lock()
+	defer valSet.validatorMu.Unlock()
+
+	addresses := make([]Address, 0, len(valSet.validators))
+	for _, v := range valSet.validators {
+		addresses = append(addresses, v.Address())
+	}
+	return NewSet(addresses)
+}
+
+// EncodeRLP encode a validatorSet following rlp standard
+func (valSet *ValidatorSet) EncodeRLP(w io.Writer) error {
+	addresses := make([]Address, 0, len(valSet.validators))
+	for _, v := range valSet.validators {
+		addresses = append(addresses, v.Address())
+	}
+	return rlp.Encode(w, []interface{}{addresses})
+}
+
+// DecodeRLP implements rlp.Decoder, and load the consensus fields from a RLP stream.
+func (valSet *ValidatorSet) DecodeRLP(s *rlp.Stream) error {
+	var addressList struct {
+		Addresses []Address
+	}
+	if err := s.Decode(&addressList); err != nil {
+		return err
+	}
+	newValSet := NewSet(addressList.Addresses)
+	valSet.validators, valSet.proposer = newValSet.validators, newValSet.proposer
+
+	return nil
+}
