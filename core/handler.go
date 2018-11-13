@@ -26,14 +26,9 @@ func (c *core) handleEvents() {
 			c.handleCheckedMsg(ev.Message, src)
 		case JoinEvent:
 			c.logger.Log("New peer:", ev.Address)
-			// add validator
-			if c.isProposer() {
-				// TODO:
-				//  - gather data new peer needs (state, addresses, sequence, ...)
-				//  - Serialize it properly (we can't ship a valSet as is)
-				//  - Send it to the peer (broadcast it for now)
-			}
+			c.handleJoin(ev.Address)
 		case StateEvent:
+			c.handleStateEvent(ev.valSet, ev.view, ev.dest)
 		}
 	}
 	c.logger.Log("End of handle events")
