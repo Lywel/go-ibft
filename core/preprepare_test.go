@@ -12,6 +12,8 @@ import (
 
 type backendTest struct{}
 
+type proposalManagerTest struct{}
+
 func (b *backendTest) PrivateKey() *ecdsa.PrivateKey {
 	return nil
 }
@@ -31,7 +33,7 @@ func (b *backendTest) EventsOutChan() chan Event {
 }
 
 // DecodeProposal parses a payload and return a Proposal interface
-func (b *backendTest) DecodeProposal(prop *ibft.EncodedProposal) (ibft.Proposal, error) {
+func (p *proposalManagerTest) DecodeProposal(prop *ibft.EncodedProposal) (ibft.Proposal, error) {
 	switch prop.Type {
 	case 1:
 		var b *blockTest
@@ -50,14 +52,15 @@ func (b *backendTest) DecodeProposal(prop *ibft.EncodedProposal) (ibft.Proposal,
 }
 
 // Verify returns an error is a proposal should be rejected
-func (b *backendTest) Verify(proposal ibft.Proposal) error { return nil }
+func (p *proposalManagerTest) Verify(proposal ibft.Proposal) error { return nil }
 
 // Commit is called by an IBFT algorythm when a Proposal is accepted
-func (b *backendTest) Commit(proposal ibft.Proposal) error { return nil }
+func (p *proposalManagerTest) Commit(proposal ibft.Proposal) error { return nil }
 
 func TestHandlePreprepare(t *testing.T) {
 	/*privkey, _ := ecdsa.GenerateKey(eth.S256(), rand.Reader)
-	backend := &backendTest{}
+	proposalManager := &proposalManagerTest{}
+
 	var a, b, c ibft.Address = [20]byte{0, 1, 2}, [20]byte{0, 1, 2, 4}, [20]byte{0, 1, 2, 5}
 	valSet := ibft.NewSet([]ibft.Address{a, b, c})
 	core := &core{
@@ -73,7 +76,7 @@ func TestHandlePreprepare(t *testing.T) {
 		logger: &Logger{
 			address: ibft.Address{0},
 		},
-		backend:    backend,
+		proposalManager: proposalManager,
 		privateKey: privkey,
 	}
 

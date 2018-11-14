@@ -142,3 +142,9 @@ func (b *Subject) DecodeRLP(s *rlp.Stream) error {
 	b.View, b.Digest = subject.View, subject.Digest
 	return nil
 }
+
+type ProposalManager interface {
+	DecodeProposal(prop *EncodedProposal) (Proposal, error)
+	Verify(proposal Proposal) error
+	Commit(proposal Proposal) error
+}

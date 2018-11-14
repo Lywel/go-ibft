@@ -10,7 +10,8 @@ import (
 func TestStoreBacklog(t *testing.T) {
 	/*privkey, _ := ecdsa.GenerateKey(eth.S256(), rand.Reader)
 	var a, b, c ibft.Address = [20]byte{0, 1, 2}, [20]byte{0, 1, 2, 4}, [20]byte{0, 1, 2, 5}
-	backend := &backendTest{}
+	proposalManager := &proposalManagerTest{}
+
 	valSet := ibft.NewSet([]ibft.Address{a, b, c})
 	core := &core{
 		address: b,
@@ -22,7 +23,6 @@ func TestStoreBacklog(t *testing.T) {
 		backlogsMu: &sync.Mutex{},
 		backlogs:   make(map[*ibft.Validator]*prque.Prque),
 		valSet:     valSet,
-		backend:    backend,
 		privateKey: privkey,
 	}
 

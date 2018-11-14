@@ -27,10 +27,11 @@ type core struct {
 	logger                *Logger
 	waitingForRoundChange bool
 	wg                    sync.WaitGroup
+	proposalManager       ibft.ProposalManager
 }
 
 // New initialize a new core
-func New(b backend) ibft.Engine {
+func New(b backend, proposalManager ibft.ProposalManager) ibft.Engine {
 	//networkManager := network.New(backend.Network(), eventHandler)
 	address := crypto.PubkeyToAddress(b.PrivateKey().PublicKey)
 	view := &ibft.View{
@@ -51,6 +52,7 @@ func New(b backend) ibft.Engine {
 		eventsOut:         b.EventsOutChan(),
 		current:           newRoundState(view, nil, ibft.NewSet([]ibft.Address{address}), nil),
 		valSet:            ibft.NewSet([]ibft.Address{address}),
+		proposalManager:   proposalManager,
 	}
 }
 

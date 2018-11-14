@@ -51,9 +51,6 @@ type backend interface {
 	PrivateKey() *ecdsa.PrivateKey
 	EventsInChan() chan Event
 	EventsOutChan() chan Event
-	DecodeProposal(prop *ibft.EncodedProposal) (ibft.Proposal, error)
-	Verify(proposal ibft.Proposal) error
-	Commit(proposal ibft.Proposal) error
 }
 
 const (

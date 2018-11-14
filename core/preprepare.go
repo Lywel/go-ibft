@@ -28,7 +28,7 @@ func (c *core) handlePreprepare(msg *message, src *ibft.Validator) error {
 	var encodedPreprepare *ibft.EncodedPreprepare
 	msg.Decode(&encodedPreprepare)
 
-	proposal, err := c.backend.DecodeProposal(encodedPreprepare.Prop)
+	proposal, err := c.proposalManager.DecodeProposal(encodedPreprepare.Prop)
 	if err != nil {
 		return err
 	}
