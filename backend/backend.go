@@ -21,6 +21,7 @@ type Backend struct {
 	ibftEventsOut   chan core.Event
 	manager         events.Manager
 	proposalManager ibft.ProposalManager
+	stillConnecting int
 }
 
 // Config is the backend configuration struct
@@ -41,8 +42,9 @@ func New(config *Config, privateKey *ecdsa.PrivateKey, proposalManager ibft.Prop
 		network:         network,
 		ibftEventsIn:    in,
 		ibftEventsOut:   out,
-		manager:         events.New(network, in, out),
+		manager:         events.New(network, in, out, len(config.RemoteAddrs)),
 		proposalManager: proposalManager,
+		stillConnecting: len(config.RemoteAddrs),
 	}
 
 	backend.core = core.New(backend, proposalManager)

@@ -1,18 +1,20 @@
 package events
 
 import (
+	"log"
+
 	"bitbucket.org/ventureslash/go-gossipnet"
 	"bitbucket.org/ventureslash/go-ibft"
 	"bitbucket.org/ventureslash/go-ibft/core"
 	"github.com/ethereum/go-ethereum/rlp"
-	"log"
 )
 
 // Manager handles data from the network
 type Manager struct {
-	node      *gossipnet.Node
-	eventsOut chan core.Event
-	eventsIn  chan core.Event
+	node           *gossipnet.Node
+	eventsOut      chan core.Event
+	eventsIn       chan core.Event
+	nodesToConnect int
 }
 
 type networkMessage struct {
@@ -26,14 +28,16 @@ const (
 	backlogEvent
 	joinEvent
 	stateEvent
+	addValidatorEvent
 )
 
 // New returns a new network.Manager
-func New(node *gossipnet.Node, eventsIn, eventsOut chan core.Event) Manager {
+func New(node *gossipnet.Node, eventsIn, eventsOut chan core.Event, nodesToConnect int) Manager {
 	return Manager{
-		node:      node,
-		eventsIn:  eventsIn,
-		eventsOut: eventsOut,
+		node:           node,
+		eventsIn:       eventsIn,
+		eventsOut:      eventsOut,
+		nodesToConnect: nodesToConnect,
 	}
 }
 
@@ -55,7 +59,10 @@ func (mngr Manager) Start(addr ibft.Address) {
 			case gossipnet.ConnOpenEvent:
 				log.Print("ConnOpenEvent")
 				// TODO: dont gossip to everyone, just the new connection
-				mngr.node.Gossip(joinBytes)
+				if mngr.nodesToConnect > 0 {
+					mngr.node.Gossip(joinBytes)
+					mngr.nodesToConnect--
+				}
 			case gossipnet.ConnCloseEvent:
 				log.Print("ConnCloseEvent")
 			case gossipnet.DataEvent:
@@ -83,7 +90,22 @@ func (mngr Manager) Start(addr ibft.Address) {
 					mngr.eventsIn <- evt
 				case stateEvent:
 					log.Print(" -StateEvent")
-
+					evt := core.StateEvent{}
+					rlp.DecodeBytes(msg.Data, &evt)
+					if err != nil {
+						log.Print(err)
+						continue
+					}
+					mngr.eventsIn <- evt
+				case addValidatorEvent:
+					log.Print(" -AddValidatorEvent")
+					evt := core.AddValidatorEvent{}
+					rlp.DecodeBytes(msg.Data, &evt)
+					if err != nil {
+						log.Print(err)
+						continue
+					}
+					mngr.eventsIn <- evt
 				}
 			case gossipnet.ListenEvent:
 				log.Print("ListenEvent")
@@ -100,17 +122,33 @@ func (mngr Manager) Start(addr ibft.Address) {
 		for event := range mngr.eventsOut {
 			switch ev := event.(type) {
 			case core.MessageEvent:
-				mngr.broadcast(ev.Payload)
+				mngr.broadcast(ev.Payload, messageEvent)
+			case core.AddValidatorEvent:
+				evBytes, err := rlp.EncodeToBytes(ev)
+				if err != nil {
+					log.Print(err)
+					return
+				}
+				mngr.broadcast(evBytes, addValidatorEvent)
+			case core.StateEvent:
+				log.Print("encode view", ev.View)
+				evBytes, err := rlp.EncodeToBytes(ev)
+				if err != nil {
+					log.Print(err)
+					return
+				}
+				mngr.broadcast(evBytes, stateEvent)
 			}
+
 		}
 	}()
 }
 
 // Broadcast implements network.Manager.Broadcast. It will tag the payload
 // forward it to the network node
-func (mngr Manager) broadcast(payload []byte) (err error) {
+func (mngr Manager) broadcast(payload []byte, msgType uint) (err error) {
 	data, err := rlp.EncodeToBytes(networkMessage{
-		Type: messageEvent,
+		Type: msgType,
 		Data: payload,
 	})
 	if err != nil {

@@ -38,7 +38,7 @@ type AddValidatorEvent struct {
 
 // StateEvent  is emmitted when a peer joins the network
 type StateEvent struct {
-	valSet *ibft.ValidatorSet
-	view   *ibft.View
-	dest   ibft.Address
+	ValSet *ibft.ValidatorSet
+	View   *ibft.View
+	Dest   ibft.Address
 }

@@ -58,6 +58,7 @@ func New(b backend, proposalManager ibft.ProposalManager) ibft.Engine {
 
 // Start implements core.Start
 func (c *core) Start() {
+	//c.eventsOut <- JoinEvent{Address: c.address}
 	c.startNewRound(ibft.Big0)
 	c.logger.Log("Core started")
 	go c.handleEvents()

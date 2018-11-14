@@ -25,11 +25,19 @@ func (c *core) handleEvents() {
 			_, src := c.valSet.GetByAddress(ev.Message.Address)
 			c.handleCheckedMsg(ev.Message, src)
 		case JoinEvent:
-			c.logger.Log("New peer:", ev.Address)
-			c.handleJoin(ev.Address)
+			if ev.Address != c.address {
+				c.logger.Log("New peer:", ev.Address)
+				c.handleJoin(ev.Address)
+			}
+
 		case StateEvent:
-			c.handleStateEvent(ev.valSet, ev.view, ev.dest)
+			c.logger.Log("received stateEvent", "view", ev.View)
+			c.handleStateEvent(ev.ValSet, ev.View, ev.Dest)
+		case AddValidatorEvent:
+			c.logger.Log("adding validator", ev.Address)
+			c.valSet.AddValidator(ev.Address)
 		}
+
 	}
 	c.logger.Log("End of handle events")
 }
