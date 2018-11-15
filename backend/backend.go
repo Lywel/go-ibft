@@ -31,10 +31,15 @@ type Config struct {
 }
 
 // New returns a new Backend
-func New(config *Config, privateKey *ecdsa.PrivateKey, proposalManager ibft.ProposalManager) *Backend {
+func New(config *Config,
+	privateKey *ecdsa.PrivateKey,
+	proposalManager ibft.ProposalManager,
+	eventProxy func(chan core.Event, chan core.Event) (chan core.Event, chan core.Event)) *Backend {
+
 	network := gossipnet.New(config.LocalAddr, config.RemoteAddrs)
 	in := make(chan core.Event, 256)
 	out := make(chan core.Event, 256)
+	pin, pout := eventProxy(in, out)
 
 	backend := &Backend{
 		privateKey:      privateKey,
@@ -42,7 +47,7 @@ func New(config *Config, privateKey *ecdsa.PrivateKey, proposalManager ibft.Prop
 		network:         network,
 		ibftEventsIn:    in,
 		ibftEventsOut:   out,
-		manager:         events.New(network, in, out, len(config.RemoteAddrs)),
+		manager:         events.New(network, pin, pout, len(config.RemoteAddrs)),
 		proposalManager: proposalManager,
 		stillConnecting: len(config.RemoteAddrs),
 	}
