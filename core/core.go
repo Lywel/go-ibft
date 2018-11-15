@@ -31,6 +31,7 @@ type core struct {
 	proposalManager       ibft.ProposalManager
 	timeouts              map[*ibft.Validator]*time.Timer
 	timeoutsMu            *sync.Mutex
+	roundChangeTimer      *time.Timer
 }
 
 // New initialize a new core
@@ -205,6 +206,7 @@ func (c *core) startNewRound(round *big.Int) {
 
 		c.updateRoundState(view, c.valSet, roundChange)
 		c.setState(StateAcceptRequest)
+		c.newRoundChangeTimer()
 	}
 }
 
@@ -216,6 +218,15 @@ func (c *core) updateRoundState(view *ibft.View, valSet *ibft.ValidatorSet,
 	} else {
 		c.current = newRoundState(view, nil, valSet, nil)
 	}
+}
+
+func (c *core) newRoundChangeTimer() {
+	if c.roundChangeTimer != nil {
+		c.roundChangeTimer.Stop()
+	}
+	c.roundChangeTimer = time.AfterFunc(ibft.RequestTimeout, func() {
+		c.logger.Log("round change is triggered here")
+	})
 }
 
 func (c *core) ValidateFn(data []byte, sig []byte) (ibft.Address, error) {

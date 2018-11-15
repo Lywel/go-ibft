@@ -14,6 +14,7 @@ import (
 const (
 	AddressLength    = 20
 	ValidatorTimeout = 20 * time.Second
+	RequestTimeout   = 20 * time.Second
 )
 
 var (

@@ -46,3 +46,5 @@ type StateEvent struct {
 	View   *ibft.View
 	Dest   ibft.Address
 }
+
+type TimeOutEvent struct{}
