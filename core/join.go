@@ -24,13 +24,14 @@ func (c *core) sendState(src ibft.Address) {
 
 func (c *core) handleStateEvent(valset *ibft.ValidatorSet, view *ibft.View,
 	dest ibft.Address) {
-	// TODO: fix
+	// TODO: fix and add security
 	if dest == c.address {
 		c.logger.Log("received state")
 		c.valSet = valset
 		c.valSet.AddValidator(c.address)
 		c.current = newRoundState(view, nil, valset, nil)
 		c.logger.Log("view", view)
+		// c.setState(StateAcceptRequest)
 		// TODO: start consensus
 	}
 }

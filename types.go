@@ -5,13 +5,15 @@ import (
 	"encoding/hex"
 	"io"
 	"math/big"
+	"time"
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
 const (
-	AddressLength = 20
+	AddressLength    = 20
+	ValidatorTimeout = 20 * time.Second
 )
 
 var (

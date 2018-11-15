@@ -4,6 +4,7 @@ import (
 	"crypto/ecdsa"
 	"math/big"
 	"sync"
+	"time"
 
 	"bitbucket.org/ventureslash/go-ibft"
 	"bitbucket.org/ventureslash/go-ibft/crypto"
@@ -28,6 +29,8 @@ type core struct {
 	waitingForRoundChange bool
 	wg                    sync.WaitGroup
 	proposalManager       ibft.ProposalManager
+	timeouts              map[*ibft.Validator]*time.Timer
+	timeoutsMu            *sync.Mutex
 }
 
 // New initialize a new core
@@ -46,13 +49,15 @@ func New(b backend, proposalManager ibft.ProposalManager) ibft.Engine {
 		backend:           b,
 		pendingRequests:   prque.New(),
 		pendingRequestsMu: &sync.Mutex{},
-		backlogsMu:        &sync.Mutex{},
 		backlogs:          make(map[*ibft.Validator]*prque.Prque),
+		backlogsMu:        &sync.Mutex{},
 		eventsIn:          b.EventsInChan(),
 		eventsOut:         b.EventsOutChan(),
 		current:           newRoundState(view, nil, ibft.NewSet([]ibft.Address{address}), nil),
 		valSet:            ibft.NewSet([]ibft.Address{address}),
 		proposalManager:   proposalManager,
+		timeouts:          make(map[*ibft.Validator]*time.Timer),
+		timeoutsMu:        &sync.Mutex{},
 	}
 }
 
