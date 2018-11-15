@@ -34,8 +34,13 @@ func (c *core) handleEvents() {
 			c.logger.Log("received stateEvent", "view", ev.View)
 			c.handleStateEvent(ev.ValSet, ev.View, ev.Dest)
 		case AddValidatorEvent:
-			c.logger.Log("adding validator", ev.Address)
-			c.valSet.AddValidator(ev.Address)
+			if ev.Address != c.address {
+				res := c.valSet.AddValidator(ev.Address)
+				if res {
+					c.logger.Log("adding validator", ev.Address)
+					c.setValidatorTimeout(ev.Address)
+				}
+			}
 		}
 
 	}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"math/big"
+	"testing"
 
 	"bitbucket.org/ventureslash/go-ibft"
 	"github.com/ethereum/go-ethereum/common"
@@ -85,6 +86,10 @@ func (b *blockTest) DecodeRLP(s *rlp.Stream) error {
 	b.number, b.data = eb.Number, eb.Data
 
 	return nil
+}
+
+func TestConnection(t *testing.T) {
+	
 }
 
 // TODO: integration tests
