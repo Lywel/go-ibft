@@ -23,9 +23,10 @@ var (
 )
 
 // Engine can be started and stoped
-type Engine interface {
+type Core interface {
 	Start()
 	Stop()
+	NetworkMap() map[Address]string
 }
 
 // Address of client

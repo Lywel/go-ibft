@@ -32,11 +32,11 @@ type core struct {
 	timeouts              map[*ibft.Validator]*time.Timer
 	timeoutsMu            *sync.Mutex
 	roundChangeTimer      *time.Timer
-	NetworkMap            map[ibft.Address]string
+	networkMap            map[ibft.Address]string
 }
 
 // New initialize a new core
-func New(b backend, proposalManager ibft.ProposalManager) ibft.Engine {
+func New(b backend, proposalManager ibft.ProposalManager) ibft.Core {
 	//networkManager := network.New(backend.Network(), eventHandler)
 	address := crypto.PubkeyToAddress(b.PrivateKey().PublicKey)
 	view := &ibft.View{
@@ -60,8 +60,12 @@ func New(b backend, proposalManager ibft.ProposalManager) ibft.Engine {
 		proposalManager:   proposalManager,
 		timeouts:          make(map[*ibft.Validator]*time.Timer),
 		timeoutsMu:        &sync.Mutex{},
-		NetworkMap:        make(map[ibft.Address]string),
+		networkMap:        make(map[ibft.Address]string),
 	}
+}
+
+func (c *core) NetworkMap() map[ibft.Address]string {
+	return c.networkMap
 }
 
 // Start implements core.Start

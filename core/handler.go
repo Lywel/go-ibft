@@ -27,7 +27,7 @@ func (c *core) handleEvents() {
 		case JoinEvent:
 			if ev.Address != c.address {
 				c.logger.Log("New peer:", ev.Address)
-				c.NetworkMap[ev.Address] = ev.NetworkAddr
+				c.networkMap[ev.Address] = ev.NetworkAddr
 				c.handleJoin(ev.Address)
 			}
 

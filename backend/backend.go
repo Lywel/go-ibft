@@ -57,7 +57,7 @@ func New(config *Config,
 }
 
 func (b *Backend) Network() map[ibft.Address]string {
-	return b.core.NetworkMap
+	return b.core.NetworkMap()
 }
 
 // PrivateKey returns the private key
