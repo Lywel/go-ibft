@@ -15,7 +15,7 @@ type Backend struct {
 	privateKey      *ecdsa.PrivateKey
 	address         ibft.Address
 	network         *gossipnet.Node
-	core            ibft.Engine
+	core            ibft.Core
 	coreRunning     bool
 	ibftEventsIn    chan core.Event
 	ibftEventsOut   chan core.Event
