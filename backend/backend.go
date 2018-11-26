@@ -22,6 +22,7 @@ type Backend struct {
 	manager         events.Manager
 	proposalManager ibft.ProposalManager
 	stillConnecting int
+	localAddr       string
 }
 
 // Config is the backend configuration struct
@@ -50,6 +51,7 @@ func New(config *Config,
 		manager:         events.New(network, pin, pout, len(config.RemoteAddrs)),
 		proposalManager: proposalManager,
 		stillConnecting: len(config.RemoteAddrs),
+		localAddr:       config.LocalAddr,
 	}
 
 	backend.core = core.New(backend, proposalManager)
@@ -57,7 +59,9 @@ func New(config *Config,
 }
 
 func (b *Backend) Network() map[ibft.Address]string {
-	return b.core.NetworkMap()
+	netmap := b.core.NetworkMap()
+	netmap[b.address] = b.localAddr
+	return netmap
 }
 
 // PrivateKey returns the private key
