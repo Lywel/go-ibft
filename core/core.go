@@ -32,6 +32,7 @@ type core struct {
 	timeouts              map[*ibft.Validator]*time.Timer
 	timeoutsMu            *sync.Mutex
 	roundChangeTimer      *time.Timer
+	NetworkMap            map[ibft.Address]string
 }
 
 // New initialize a new core
@@ -59,6 +60,7 @@ func New(b backend, proposalManager ibft.ProposalManager) ibft.Engine {
 		proposalManager:   proposalManager,
 		timeouts:          make(map[*ibft.Validator]*time.Timer),
 		timeoutsMu:        &sync.Mutex{},
+		NetworkMap:        make(map[ibft.Address]string),
 	}
 }
 

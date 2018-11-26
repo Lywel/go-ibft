@@ -81,7 +81,9 @@ func (mngr Manager) Start(addr ibft.Address) {
 					}
 				case joinEvent:
 					log.Print(" -JoinEvent")
-					evt := core.JoinEvent{}
+					evt := core.JoinEvent{
+						NetworkAddr: ev.Addr,
+					}
 					evt.Address.FromBytes(msg.Data)
 					if err != nil {
 						log.Print(err)

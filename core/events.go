@@ -29,7 +29,8 @@ type MessageEvent struct {
 
 // JoinEvent is emmitted when a peer joins the network
 type JoinEvent struct {
-	Address ibft.Address
+	Address     ibft.Address
+	NetworkAddr string
 }
 
 type AddValidatorEvent struct {
