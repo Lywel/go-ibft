@@ -65,6 +65,11 @@ func New(b backend, proposalManager ibft.ProposalManager) ibft.Core {
 }
 
 func (c *core) NetworkMap() map[ibft.Address]string {
+	for key := range c.networkMap {
+		if !c.isValidator(key) {
+			delete(c.networkMap, key)
+		}
+	}
 	return c.networkMap
 }
 
