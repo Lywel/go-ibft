@@ -14,6 +14,7 @@ type Manager struct {
 	node           *gossipnet.Node
 	eventsOut      chan core.Event
 	eventsIn       chan core.Event
+	eventsCustom   chan []byte
 	nodesToConnect int
 }
 
@@ -29,14 +30,16 @@ const (
 	joinEvent
 	stateEvent
 	addValidatorEvent
+	customEvent
 )
 
 // New returns a new network.Manager
-func New(node *gossipnet.Node, eventsIn, eventsOut chan core.Event, nodesToConnect int) Manager {
+func New(node *gossipnet.Node, eventsIn, eventsOut chan core.Event, eventsCustom chan []byte, nodesToConnect int) Manager {
 	return Manager{
 		node:           node,
 		eventsIn:       eventsIn,
 		eventsOut:      eventsOut,
+		eventsCustom:   eventsCustom,
 		nodesToConnect: nodesToConnect,
 	}
 }
@@ -108,6 +111,9 @@ func (mngr Manager) Start(addr ibft.Address) {
 						continue
 					}
 					mngr.eventsIn <- evt
+				case customEvent:
+					log.Print(" -customEvent")
+					mngr.eventsCustom <- msg.Data
 				}
 			case gossipnet.ListenEvent:
 				log.Print("ListenEvent")
