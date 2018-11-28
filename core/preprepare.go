@@ -48,9 +48,6 @@ func (c *core) handlePreprepare(msg *message, src *ibft.Validator) error {
 	}
 	if err := c.verify(preprepare.Proposal); err != nil {
 		c.logger.Log("failed to verify proposal")
-		// TODO
-		// if it's a future block, we will handle it again after the duration
-		// else sendNextRoundChange
 
 		return err
 	}

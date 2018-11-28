@@ -15,7 +15,7 @@ func (c *core) handleEvents() {
 			r := &ibft.Request{
 				Proposal: ev.Proposal,
 			}
-			err := c.checkRequest(r)
+			err := c.handleRequest(r)
 			if err == errFutureMessage {
 				c.storeRequest(r)
 			} else if err != nil {

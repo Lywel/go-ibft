@@ -33,6 +33,5 @@ func (c *core) handleStateEvent(valset *ibft.ValidatorSet, view *ibft.View,
 		c.current = newRoundState(view, nil, valset, nil)
 		c.logger.Log("view", view)
 		// c.setState(StateAcceptRequest)
-		// TODO: start consensus
 	}
 }
