@@ -102,6 +102,15 @@ func (mngr Manager) Start(addr ibft.Address) {
 						continue
 					}
 					mngr.eventsIn <- evt
+				case requestEvent:
+					log.Print(" -RequestEvent")
+					evt := core.RequestEvent{}
+					rlp.DecodeBytes(msg.Data, &evt)
+					if err != nil {
+						log.Print(err)
+						continue
+					}
+					mngr.eventsIn <- evt
 				case addValidatorEvent:
 					log.Print(" -AddValidatorEvent")
 					evt := core.AddValidatorEvent{}
@@ -146,8 +155,15 @@ func (mngr Manager) Start(addr ibft.Address) {
 					return
 				}
 				mngr.broadcast(evBytes, stateEvent)
-			}
+			case core.RequestEvent:
+				evBytes, err := rlp.EncodeToBytes(ev)
+				if err != nil {
+					log.Print(err)
+					return
+				}
+				mngr.broadcast(evBytes, requestEvent)
 
+			}
 		}
 	}()
 }
