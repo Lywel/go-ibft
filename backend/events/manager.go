@@ -104,7 +104,7 @@ func (mngr Manager) Start(addr ibft.Address) {
 					mngr.eventsIn <- evt
 				case requestEvent:
 					log.Print(" -RequestEvent")
-					evt := core.RequestEvent{}
+					evt := core.EncodedRequestEvent{}
 					rlp.DecodeBytes(msg.Data, &evt)
 					if err != nil {
 						log.Print(err)
@@ -155,7 +155,7 @@ func (mngr Manager) Start(addr ibft.Address) {
 					return
 				}
 				mngr.broadcast(evBytes, stateEvent)
-			case core.RequestEvent:
+			case core.EncodedRequestEvent:
 				evBytes, err := rlp.EncodeToBytes(ev)
 				if err != nil {
 					log.Print(err)

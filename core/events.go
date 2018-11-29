@@ -17,6 +17,10 @@ type RequestEvent struct {
 	Proposal ibft.Proposal
 }
 
+type EncodedRequestEvent struct {
+	Proposal *ibft.EncodedProposal
+}
+
 // BacklogEvent  is an internal event used to store an event for latter processing
 type BacklogEvent struct {
 	Message *message
@@ -49,4 +53,3 @@ type StateEvent struct {
 }
 
 type TimeOutEvent struct{}
-

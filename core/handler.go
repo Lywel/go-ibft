@@ -1,6 +1,8 @@
 package core
 
 import (
+	"log"
+
 	"bitbucket.org/ventureslash/go-ibft"
 )
 
@@ -21,6 +23,13 @@ func (c *core) handleEvents() {
 			} else if err != nil {
 				c.logger.Log("handle event request", "err", err)
 			}
+		case EncodedRequestEvent:
+			encodedProposal := ev.Proposal
+			decodedProposal, err := c.proposalManager.DecodeProposal(encodedProposal)
+			if err != nil {
+				log.Print(err)
+			}
+			c.eventsIn <- RequestEvent{Proposal: decodedProposal}
 		case BacklogEvent:
 			_, src := c.valSet.GetByAddress(ev.Message.Address)
 			c.handleCheckedMsg(ev.Message, src)
