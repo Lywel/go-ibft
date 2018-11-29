@@ -136,7 +136,7 @@ func (c *core) broadcast(msg *message) {
 }
 
 func (c *core) verify(p ibft.Proposal) error {
-	return nil
+	return c.proposalManager.Verify(p)
 }
 
 func (c *core) checkMessage(msgType uint64, view *ibft.View) error {

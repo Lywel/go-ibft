@@ -20,3 +20,15 @@ func PubkeyToAddress(p ecdsa.PublicKey) ibft.Address {
 	copy(a[ibft.AddressLength-len(ethAddress):], ethAddress[:])
 	return a
 }
+
+// GetSignatureAddress returns an address from a signature
+func GetSignatureAddress(data []byte, sig []byte) (ibft.Address, error) {
+	// 1. Keccak data
+	hashData := crypto.Keccak256([]byte(data))
+	// 2. Recover public key
+	pubkey, err := crypto.SigToPub(hashData, sig)
+	if err != nil {
+		return ibft.Address{}, err
+	}
+	return PubkeyToAddress(*pubkey), nil
+}
