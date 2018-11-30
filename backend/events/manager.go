@@ -1,13 +1,16 @@
 package events
 
 import (
-	"log"
-
 	"bitbucket.org/ventureslash/go-gossipnet"
 	"bitbucket.org/ventureslash/go-ibft"
 	"bitbucket.org/ventureslash/go-ibft/core"
+	"flag"
 	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/google/logger"
+	"io/ioutil"
 )
+
+var verbose = flag.Bool("verbose-manager", false, "print manager info level logs")
 
 // Manager handles data from the network
 type Manager struct {
@@ -16,6 +19,7 @@ type Manager struct {
 	eventsIn       chan core.Event
 	eventsCustom   chan []byte
 	nodesToConnect int
+	debug          *logger.Logger
 }
 
 type networkMessage struct {
@@ -46,13 +50,16 @@ func New(node *gossipnet.Node, eventsIn, eventsOut chan core.Event, eventsCustom
 
 // Start Broadcast core address and starts to listen on node.EventChan()
 func (mngr Manager) Start(addr ibft.Address) {
+	mngr.debug = logger.Init("Manager", *verbose, false, ioutil.Discard)
+	mngr.debug.Infof("Start")
+
 	addrBytes := addr.GetBytes()
 	joinBytes, err := rlp.EncodeToBytes(networkMessage{
 		Type: joinEvent,
 		Data: addrBytes[:],
 	})
 	if err != nil {
-		log.Print("encode error: ", err)
+		mngr.debug.Warningf("encode error: ", err)
 	}
 
 	// Dispatch network events to IBFT
@@ -60,75 +67,75 @@ func (mngr Manager) Start(addr ibft.Address) {
 		for event := range mngr.node.EventChan() {
 			switch ev := event.(type) {
 			case gossipnet.ConnOpenEvent:
-				log.Print("ConnOpenEvent")
+				mngr.debug.Info("ConnOpenEvent")
 				// TODO: dont gossip to everyone, just the new connection
 				if mngr.nodesToConnect > 0 {
 					mngr.node.Gossip(joinBytes)
 					mngr.nodesToConnect--
 				}
 			case gossipnet.ConnCloseEvent:
-				log.Print("ConnCloseEvent")
+				mngr.debug.Info("ConnCloseEvent")
 			case gossipnet.DataEvent:
-				log.Print("DataEvent")
+				mngr.debug.Info("DataEvent")
 				var msg networkMessage
 				err := rlp.DecodeBytes(ev.Data, &msg)
 				if err != nil {
-					log.Print("Error parsing msg:", string(ev.Data))
+					mngr.debug.Warningf("Error parsing msg:", string(ev.Data))
 					continue
 				}
 				switch msg.Type {
 				case messageEvent:
-					log.Print(" -MsgEvent")
+					mngr.debug.Info(" -MsgEvent")
 					mngr.eventsIn <- core.MessageEvent{
 						Payload: msg.Data,
 					}
 				case joinEvent:
-					log.Print(" -JoinEvent")
+					mngr.debug.Info(" -JoinEvent")
 					evt := core.JoinEvent{
 						NetworkAddr: ev.Addr,
 					}
 					evt.Address.FromBytes(msg.Data)
 					if err != nil {
-						log.Print(err)
+						mngr.debug.Warning(err)
 						continue
 					}
 					mngr.eventsIn <- evt
 				case stateEvent:
-					log.Print(" -StateEvent")
+					mngr.debug.Info(" -StateEvent")
 					evt := core.StateEvent{}
 					rlp.DecodeBytes(msg.Data, &evt)
 					if err != nil {
-						log.Print(err)
+						mngr.debug.Warning(err)
 						continue
 					}
 					mngr.eventsIn <- evt
 				case requestEvent:
-					log.Print(" -RequestEvent")
+					mngr.debug.Info(" -RequestEvent")
 					evt := core.EncodedRequestEvent{}
 					rlp.DecodeBytes(msg.Data, &evt)
 					if err != nil {
-						log.Print(err)
+						mngr.debug.Warning(err)
 						continue
 					}
 
 					mngr.eventsIn <- evt
 				case addValidatorEvent:
-					log.Print(" -AddValidatorEvent")
+					mngr.debug.Info(" -AddValidatorEvent")
 					evt := core.AddValidatorEvent{}
 					rlp.DecodeBytes(msg.Data, &evt)
 					if err != nil {
-						log.Print(err)
+						mngr.debug.Warning(err)
 						continue
 					}
 					mngr.eventsIn <- evt
 				case customEvent:
-					log.Print(" -customEvent")
+					mngr.debug.Info(" -customEvent")
 					mngr.eventsCustom <- msg.Data
 				}
 			case gossipnet.ListenEvent:
-				log.Print("ListenEvent")
+				mngr.debug.Info("ListenEvent")
 			case gossipnet.CloseEvent:
-				log.Print("CloseEvent")
+				mngr.debug.Info("CloseEvent")
 				close(mngr.eventsIn)
 				break
 			}
@@ -144,22 +151,22 @@ func (mngr Manager) Start(addr ibft.Address) {
 			case core.AddValidatorEvent:
 				evBytes, err := rlp.EncodeToBytes(ev)
 				if err != nil {
-					log.Print(err)
+					mngr.debug.Warning(err)
 					return
 				}
 				mngr.broadcast(evBytes, addValidatorEvent)
 			case core.StateEvent:
-				log.Print("encode view", ev.View)
+				mngr.debug.Infof("encoded view: %s", ev.View)
 				evBytes, err := rlp.EncodeToBytes(ev)
 				if err != nil {
-					log.Print(err)
+					mngr.debug.Warning(err)
 					return
 				}
 				mngr.broadcast(evBytes, stateEvent)
 			case core.EncodedRequestEvent:
 				evBytes, err := rlp.EncodeToBytes(ev)
 				if err != nil {
-					log.Print(err)
+					mngr.debug.Warning(err)
 					return
 				}
 				mngr.broadcast(evBytes, requestEvent)
