@@ -1,16 +1,17 @@
 package core
 
 import (
-	"bitbucket.org/ventureslash/go-ibft"
 	"reflect"
+
+	"bitbucket.org/ventureslash/go-ibft"
 )
 
 func (c *core) sendCommit() {
-	c.logger.Log("send commit")
+	c.logger.Info(c.address, ": Send commit")
 	subject := c.current.Subject()
 	commit, err := Encode(subject)
 	if err != nil {
-		c.logger.Log("Encode subject failed")
+		c.logger.Warning(c.address, ": Encode subject failed")
 		return
 	}
 	c.broadcast(&message{
@@ -20,7 +21,7 @@ func (c *core) sendCommit() {
 }
 
 func (c *core) handleCommit(msg *message, src *ibft.Validator) error {
-	c.logger.Log("Handle commit from", src)
+	c.logger.Info(c.address, ": Handle commit from ", src)
 	var commit *ibft.Subject
 	err := msg.Decode(&commit)
 	if err != nil {
@@ -33,7 +34,7 @@ func (c *core) handleCommit(msg *message, src *ibft.Validator) error {
 		return err
 	}
 	if err := c.current.Commits.Add(msg); err != nil {
-		c.logger.Log("Failed to add COMMIT message", "msg", msg, "err", err)
+		c.logger.Warning(c.address, ": Failed to add COMMIT message ", "msg ", msg, " err ", err)
 	}
 	if c.current.Commits.Size() > 2*c.valSet.F() && c.state.Cmp(StateCommitted) < 0 {
 		c.commit()
@@ -44,7 +45,7 @@ func (c *core) handleCommit(msg *message, src *ibft.Validator) error {
 func (c *core) verifyCommit(commit *ibft.Subject) error {
 	subject := c.current.Subject()
 	if !reflect.DeepEqual(commit, subject) {
-		c.logger.Log("subjects do not match: expected", subject, "got", commit)
+		c.logger.Warning(c.address, ": Subjects do not match: expected ", subject, " got ", commit)
 		return errSubjectsDoNotMatch
 	}
 	return nil

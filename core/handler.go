@@ -22,7 +22,7 @@ func (c *core) handleEvents() {
 			if err == errFutureMessage {
 				c.storeRequest(r)
 			} else if err != nil {
-				c.logger.Log("handle event request", "err", err)
+				c.logger.Warning(c.address, ": Handle event request ", "err ", err)
 			}
 		case EncodedRequestEvent:
 			var encodedProposal *ibft.EncodedProposal
@@ -42,38 +42,38 @@ func (c *core) handleEvents() {
 			c.handleCheckedMsg(ev.Message, src)
 		case JoinEvent:
 			if ev.Address != c.address {
-				c.logger.Log("New peer:", ev.Address)
+				c.logger.Info(c.address, ": New peer: ", ev.Address)
 				c.networkMap[ev.Address] = ev.NetworkAddr
 				c.handleJoin(ev.Address)
 			}
 
 		case StateEvent:
-			c.logger.Log("received stateEvent", "view", ev.View)
+			c.logger.Info(c.address, ": Received stateEvent ", "view ", ev.View)
 			c.handleStateEvent(ev.ValSet, ev.View, ev.Dest)
 		case AddValidatorEvent:
 			if ev.Address != c.address {
 				res := c.valSet.AddValidator(ev.Address)
 				if res {
-					c.logger.Log("adding validator", ev.Address)
+					c.logger.Info(c.address, "Adding validator ", ev.Address)
 					c.setValidatorTimeout(ev.Address)
 				}
 			}
 		}
 
 	}
-	c.logger.Log("End of handle events")
+	c.logger.Info(c.address, ": End of handle events")
 }
 
 // decodes message, checks and calls handleCheckedMsg
 func (c *core) handleMsg(payload []byte) error {
 	msg := new(message)
 	if err := msg.FromPayload(payload, c.ValidateFn); err != nil {
-		c.logger.Log("failed to decode message from payload", "err", err)
+		c.logger.Warning(c.address, ": Failed to decode message from payload ", "err ", err)
 		return err
 	}
 	_, src := c.valSet.GetByAddress(msg.Address)
 	if src == nil {
-		c.logger.Log("invalid address in message", "msg", msg)
+		c.logger.Warning(c.address, ": invalid address in message ", "msg ", msg)
 		return errUnauthorized
 	}
 	return c.handleCheckedMsg(msg, src)
@@ -98,7 +98,7 @@ func (c *core) handleCheckedMsg(msg *message, src *ibft.Validator) error {
 	case typeCommit:
 		return testBacklog(c.handleCommit(msg, src))
 	case typeRoundChange:
-		c.logger.Log("round change event received, ignore")
+		c.logger.Info(c.address, ": Round change event received, ignore")
 		// TODO call handleroundchange
 		return nil
 	default:

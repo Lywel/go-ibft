@@ -68,7 +68,7 @@ func (c *core) processBacklogs() {
 			m, prio := backlog.Pop()
 			msg, ok := m.(*message)
 			if !ok {
-				c.logger.Log("failed to cast message from backlog")
+				c.logger.Warningf("Failed to cast message from backlog")
 				break
 			}
 			var view *ibft.View
@@ -88,12 +88,12 @@ func (c *core) processBacklogs() {
 			}
 			if err := c.checkMessage(msg.Type, view); err != nil {
 				if err == errFutureMessage {
-					c.logger.Log("stop processing future backlog", "msg", msg)
+					c.logger.Warning("Stop processing future backlog ", "msg ", msg)
 					backlog.Push(msg, prio)
 					isFuture = true
 					break
 				}
-				c.logger.Log("stop processing invalid backlog", "msg", msg)
+				c.logger.Warning("Stop processing invalid backlog ", "msg ", msg)
 				continue
 			}
 			c.eventsIn <- BacklogEvent{

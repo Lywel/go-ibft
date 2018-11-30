@@ -2,6 +2,8 @@ package core
 
 import (
 	"crypto/ecdsa"
+	"flag"
+	"io/ioutil"
 	"math/big"
 	"sync"
 	"time"
@@ -9,8 +11,11 @@ import (
 	"bitbucket.org/ventureslash/go-ibft"
 	"bitbucket.org/ventureslash/go-ibft/crypto"
 	eth "github.com/ethereum/go-ethereum/crypto"
+	"github.com/google/logger"
 	"gopkg.in/karalabe/cookiejar.v2/collections/prque"
 )
+
+var verbose = flag.Bool("verbose-core", false, "print core info level logs")
 
 type core struct {
 	address               ibft.Address
@@ -25,7 +30,7 @@ type core struct {
 	pendingRequestsMu     *sync.Mutex
 	backlogs              map[*ibft.Validator]*prque.Prque
 	backlogsMu            *sync.Mutex
-	logger                *Logger
+	logger                *logger.Logger
 	waitingForRoundChange bool
 	wg                    sync.WaitGroup
 	proposalManager       ibft.ProposalManager
@@ -43,11 +48,11 @@ func New(b backend, proposalManager ibft.ProposalManager) ibft.Core {
 		Round:    big.NewInt(0),
 		Sequence: big.NewInt(0),
 	}
-	return &core{
+	c := &core{
 		address:           address,
 		privateKey:        b.PrivateKey(),
 		state:             StateAcceptRequest,
-		logger:            &Logger{address: address},
+		logger:            logger.Init("Core", *verbose, false, ioutil.Discard),
 		backend:           b,
 		pendingRequests:   prque.New(),
 		pendingRequestsMu: &sync.Mutex{},
@@ -62,6 +67,8 @@ func New(b backend, proposalManager ibft.ProposalManager) ibft.Core {
 		timeoutsMu:        &sync.Mutex{},
 		networkMap:        make(map[ibft.Address]string),
 	}
+	c.logger.Infof("Start")
+	return c
 }
 
 func (c *core) NetworkMap() map[ibft.Address]string {
@@ -77,15 +84,15 @@ func (c *core) NetworkMap() map[ibft.Address]string {
 func (c *core) Start() {
 	//c.eventsOut <- JoinEvent{Address: c.address}
 	c.startNewRound(ibft.Big0)
-	c.logger.Log("Core started")
+	c.logger.Info("Core started")
 	go c.handleEvents()
 }
 
 // Stop implements core.Stop
 func (c *core) Stop() {
-	c.logger.Log("Stopping the core")
+	c.logger.Info(c.address, ": Stopping the core")
 	c.wg.Wait()
-	c.logger.Log("Core stopped")
+	c.logger.Info(c.address, ": Core stopped")
 }
 
 func (c *core) isValidator(a ibft.Address) bool {
@@ -128,7 +135,7 @@ func (c *core) finalizeMessage(msg *message) ([]byte, error) {
 func (c *core) broadcast(msg *message) {
 	payload, err := c.finalizeMessage(msg)
 	if err != nil {
-		c.logger.Log("failed to finalize message", "msg", msg, "err", err)
+		c.logger.Warning(c.address, ": Failed to finalize message ", "msg ", msg, " err ", err)
 		return
 	}
 	// Broadcast
@@ -184,11 +191,11 @@ func (c *core) commit() {
 	proposal := c.current.Preprepare.Proposal
 	if proposal != nil {
 		if err := c.proposalManager.Commit(c.current.Preprepare.Proposal); err == nil {
-			c.logger.Log("committed")
+			c.logger.Info(c.address, ": Proposal committed")
 			c.startNewRound(ibft.Big0)
 
 		} else {
-			c.logger.Log("commit failed", "err", err)
+			c.logger.Warning(c.address, ": Commit failed ", "err ", err)
 			//TODO trigger change view
 		}
 	}
@@ -205,7 +212,7 @@ func (c *core) setState(state State) {
 // startNewRound starts a new round. if round equals to 0, it means to starts a
 // new sequence
 func (c *core) startNewRound(round *big.Int) {
-	c.logger.Log("start new sequence")
+	c.logger.Info(c.address, ": Start new sequence")
 	roundChange := false
 	// TODO check if there is a round change
 
@@ -233,7 +240,7 @@ func (c *core) startNewRound(round *big.Int) {
 func (c *core) updateRoundState(view *ibft.View, valSet *ibft.ValidatorSet,
 	roundChange bool) {
 	if roundChange {
-		c.logger.Log("update round")
+		c.logger.Info(c.address, ": Update round number")
 		// TODO round change
 	} else {
 		c.current = newRoundState(view, nil, valSet, nil)
@@ -245,7 +252,7 @@ func (c *core) newRoundChangeTimer() {
 		c.roundChangeTimer.Stop()
 	}
 	c.roundChangeTimer = time.AfterFunc(ibft.RequestTimeout, func() {
-		c.logger.Log("round change is triggered here")
+		c.logger.Info(c.address, ": Round change triggered")
 	})
 }
 

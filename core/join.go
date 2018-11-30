@@ -6,7 +6,7 @@ import (
 
 func (c *core) handleJoin(src ibft.Address) {
 	if c.isProposer() {
-		c.logger.Log("handle join from", src)
+		c.logger.Info(c.address, ": Handle join from ", src)
 		c.eventsOut <- AddValidatorEvent{
 			Address: src,
 		}
@@ -26,12 +26,12 @@ func (c *core) handleStateEvent(valset *ibft.ValidatorSet, view *ibft.View,
 	dest ibft.Address) {
 	// TODO: fix and add security
 	if dest == c.address {
-		c.logger.Log("received state")
+		c.logger.Info(c.address, " Received state")
 		c.valSet = valset
 		c.valSet.AddValidator(c.address)
 		c.initTimeouts()
 		c.current = newRoundState(view, nil, valset, nil)
-		c.logger.Log("view", view)
+		c.logger.Info(c.address, ": view ", view)
 		// c.setState(StateAcceptRequest)
 	}
 }

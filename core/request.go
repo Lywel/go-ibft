@@ -7,14 +7,14 @@ import (
 func (c *core) handleRequest(request *ibft.Request) error {
 	if err := c.checkRequest(request); err != nil {
 		if err == errInvalidMessage {
-			c.logger.Log("invalid message")
+			c.logger.Warning(c.address, ": Invalid message")
 			return err
 		}
-		c.logger.Log("unexpected request", "err", err, "number",
+		c.logger.Warning(c.address, ": Unexpected request ", "err ", err, " number",
 			request.Proposal.Number())
 		return err
 	}
-	c.logger.Log("HandleRequest number", request.Proposal.Number(), "hash",
+	c.logger.Info(c.address, ": HandleRequest number ", request.Proposal.Number(), " hash ",
 		request.Proposal.Hash())
 	c.current.pendingRequest = request
 	if c.state == StateAcceptRequest {
@@ -37,7 +37,7 @@ func (c *core) checkRequest(request *ibft.Request) error {
 }
 
 func (c *core) storeRequest(request *ibft.Request) {
-	c.logger.Log("storing future request", "number", request.Proposal.Number(),
+	c.logger.Info(c.address, ": Storing future request ", "number ", request.Proposal.Number(),
 		"Hash", request.Proposal.Hash())
 	c.pendingRequestsMu.Lock()
 	defer c.pendingRequestsMu.Unlock()
@@ -53,22 +53,22 @@ func (c *core) processPendingRequests() {
 		r, ok := m.(*ibft.Request)
 
 		if !ok {
-			c.logger.Log("request malformed")
+			c.logger.Warning(c.address, ": Request malformed")
 			continue
 		}
 		if err := c.checkRequest(r); err != nil {
 			if err == errFutureMessage {
-				c.logger.Log("future message", "number", r.Proposal.Number(),
+				c.logger.Warning(c.address, ": Future message ", "number ", r.Proposal.Number(),
 					"Hash", r.Proposal.Hash())
 
 				c.pendingRequests.Push(m, prio)
 			}
-			c.logger.Log("skipping pending request", "number", r.Proposal.Number(),
+			c.logger.Warning(c.address, ": Skipping pending request ", "number ", r.Proposal.Number(),
 				"Hash", r.Proposal.Hash())
 			continue
 		}
-		c.logger.Log("processing pending request", "number", r.Proposal.Number(),
-			"Hash", r.Proposal.Hash())
+		c.logger.Info(c.address, ": Processing pending request ", "number ", r.Proposal.Number(),
+			" Hash ", r.Proposal.Hash())
 
 		c.eventsIn <- RequestEvent{
 			Proposal: r.Proposal,

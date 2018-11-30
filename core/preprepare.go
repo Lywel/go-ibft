@@ -6,13 +6,13 @@ import (
 
 func (c *core) sendPreprepare(request *ibft.Request) {
 	if request.Proposal.Number().Cmp(c.current.sequence) == 0 && c.isProposer() {
-		c.logger.Log("Send preprepare")
+		c.logger.Info(c.address, ": Send preprepare")
 		preprepare, err := Encode(&ibft.Preprepare{
 			View:     c.currentView(),
 			Proposal: request.Proposal,
 		})
 		if err != nil {
-			c.logger.Log("failed to encode")
+			c.logger.Warning(c.address, ": Failed to encode")
 			return
 		}
 		c.broadcast(&message{
@@ -23,7 +23,7 @@ func (c *core) sendPreprepare(request *ibft.Request) {
 }
 
 func (c *core) handlePreprepare(msg *message, src *ibft.Validator) error {
-	c.logger.Log("Handle preprepare from", src.String())
+	c.logger.Info(c.address, ": Handle preprepare from ", src.String())
 
 	var encodedPreprepare *ibft.EncodedPreprepare
 	msg.Decode(&encodedPreprepare)
@@ -39,7 +39,7 @@ func (c *core) handlePreprepare(msg *message, src *ibft.Validator) error {
 	}
 
 	if err := c.checkMessage(typePreprepare, preprepare.View); err != nil {
-		c.logger.Log("check message failed")
+		c.logger.Warning(c.address, ": Check message failed")
 		return err
 	}
 
@@ -47,7 +47,7 @@ func (c *core) handlePreprepare(msg *message, src *ibft.Validator) error {
 		return errNotFromProposer
 	}
 	if err := c.verify(preprepare.Proposal); err != nil {
-		c.logger.Log("failed to verify proposal", "err", err)
+		c.logger.Warning(c.address, ": Failed to verify proposal ", "err ", err)
 
 		return err
 	}
