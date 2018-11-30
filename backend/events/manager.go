@@ -110,6 +110,7 @@ func (mngr Manager) Start(addr ibft.Address) {
 						log.Print(err)
 						continue
 					}
+
 					mngr.eventsIn <- evt
 				case addValidatorEvent:
 					log.Print(" -AddValidatorEvent")

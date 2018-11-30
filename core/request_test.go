@@ -27,7 +27,10 @@ func TestHandleRequest(t *testing.T) {
 		},
 	}
 
-	block := newBlockTest(ibft.Big1, "test")
+	block := newBlockTest(&headerTest{
+		Number:     ibft.Big1,
+		ParentHash: []byte{},
+	}, []*transactionTest{})
 	request := &ibft.Request{
 		Proposal: block,
 	}
@@ -57,7 +60,10 @@ func TestHandleOldRequest(t *testing.T) {
 		},
 	}
 
-	oldBlock := newBlockTest(ibft.Big0, "test")
+	oldBlock := newBlockTest(&headerTest{
+		Number:     ibft.Big0,
+		ParentHash: []byte{},
+	}, []*transactionTest{})
 	request := &ibft.Request{
 		Proposal: oldBlock,
 	}
@@ -86,7 +92,10 @@ func TestHandleFutureRequest(t *testing.T) {
 		},
 	}
 
-	futureBlock := newBlockTest(big.NewInt(2), "test")
+	futureBlock := newBlockTest(&headerTest{
+		Number:     big.NewInt(2),
+		ParentHash: []byte{},
+	}, []*transactionTest{})
 	request := &ibft.Request{
 		Proposal: futureBlock,
 	}

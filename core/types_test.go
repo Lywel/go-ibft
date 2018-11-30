@@ -8,7 +8,10 @@ import (
 
 func TestEncode(t *testing.T) {
 
-	block := newBlockTest(ibft.Big1, "test")
+	block := newBlockTest(&headerTest{
+		Number:     ibft.Big1,
+		ParentHash: []byte{},
+	}, []*transactionTest{})
 
 	preprepare, err := Encode(&ibft.Preprepare{
 		View: &ibft.View{
@@ -27,7 +30,10 @@ func TestDecodePrePrepare(t *testing.T) {
 	var a ibft.Address = [20]byte{0, 1, 2}
 	proposalManager := &proposalManagerTest{}
 
-	block := newBlockTest(ibft.Big1, "test")
+	block := newBlockTest(&headerTest{
+		Number:     ibft.Big1,
+		ParentHash: []byte{},
+	}, []*transactionTest{})
 
 	pre, err := Encode(&ibft.Preprepare{
 		View: &ibft.View{

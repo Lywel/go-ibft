@@ -181,8 +181,17 @@ func (c *core) checkMessage(msgType uint64, view *ibft.View) error {
 
 func (c *core) commit() {
 	c.setState(StateCommitted)
-	c.logger.Log("committed")
-	c.startNewRound(ibft.Big0)
+	proposal := c.current.Preprepare.Proposal
+	if proposal != nil {
+		if err := c.proposalManager.Commit(c.current.Preprepare.Proposal); err == nil {
+			c.logger.Log("committed")
+			c.startNewRound(ibft.Big0)
+
+		} else {
+			c.logger.Log("commit failed", "err", err)
+			//TODO trigger change view
+		}
+	}
 }
 
 func (c *core) setState(state State) {

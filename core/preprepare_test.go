@@ -35,7 +35,7 @@ func (b *backendTest) EventsOutChan() chan Event {
 // DecodeProposal parses a payload and return a Proposal interface
 func (p *proposalManagerTest) DecodeProposal(prop *ibft.EncodedProposal) (ibft.Proposal, error) {
 	switch prop.Type {
-	case 1:
+	case 0:
 		var b *blockTest
 		err := rlp.DecodeBytes(prop.Prop, &b)
 		if err != nil {

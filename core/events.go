@@ -18,7 +18,7 @@ type RequestEvent struct {
 }
 
 type EncodedRequestEvent struct {
-	Proposal *ibft.EncodedProposal
+	Proposal []byte
 }
 
 // BacklogEvent  is an internal event used to store an event for latter processing

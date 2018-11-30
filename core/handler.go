@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"bitbucket.org/ventureslash/go-ibft"
+	"github.com/ethereum/go-ethereum/rlp"
 )
 
 func (c *core) handleEvents() {
@@ -24,10 +25,16 @@ func (c *core) handleEvents() {
 				c.logger.Log("handle event request", "err", err)
 			}
 		case EncodedRequestEvent:
-			encodedProposal := ev.Proposal
+			var encodedProposal *ibft.EncodedProposal
+			err := rlp.DecodeBytes(ev.Proposal, &encodedProposal)
+			if err != nil {
+				log.Print(err)
+				continue
+			}
 			decodedProposal, err := c.proposalManager.DecodeProposal(encodedProposal)
 			if err != nil {
 				log.Print(err)
+				continue
 			}
 			c.eventsIn <- RequestEvent{Proposal: decodedProposal}
 		case BacklogEvent:

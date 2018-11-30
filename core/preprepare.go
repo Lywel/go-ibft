@@ -47,7 +47,7 @@ func (c *core) handlePreprepare(msg *message, src *ibft.Validator) error {
 		return errNotFromProposer
 	}
 	if err := c.verify(preprepare.Proposal); err != nil {
-		c.logger.Log("failed to verify proposal")
+		c.logger.Log("failed to verify proposal", "err", err)
 
 		return err
 	}
