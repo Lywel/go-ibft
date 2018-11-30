@@ -1,7 +1,7 @@
 module bitbucket.org/ventureslash/go-ibft
 
 require (
-	bitbucket.org/ventureslash/go-gossipnet v0.1.2
+	bitbucket.org/ventureslash/go-gossipnet v0.2.0
 	github.com/btcsuite/btcd v0.0.0-20181013004428-67e573d211ac // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/ethereum/go-ethereum v1.8.17
