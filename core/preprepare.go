@@ -31,6 +31,7 @@ func (c *core) handlePreprepare(msg *message, src *ibft.Validator) error {
 
 	proposal, err := c.proposalManager.DecodeProposal(encodedPreprepare.Prop)
 	if err != nil {
+		c.logger.Warning("failed to decode proposal ", "err ", err)
 		return err
 	}
 

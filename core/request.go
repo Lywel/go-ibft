@@ -10,7 +10,7 @@ func (c *core) handleRequest(request *ibft.Request) error {
 			c.logger.Warning(c.address, ": Invalid message")
 			return err
 		}
-		c.logger.Warning(c.address, ": Unexpected request ", "err ", err, " number",
+		c.logger.Warning(c.address, ": Unexpected request ", "err ", err, " number ",
 			request.Proposal.Number())
 		return err
 	}
@@ -38,7 +38,7 @@ func (c *core) checkRequest(request *ibft.Request) error {
 
 func (c *core) storeRequest(request *ibft.Request) {
 	c.logger.Info(c.address, ": Storing future request ", "number ", request.Proposal.Number(),
-		"Hash", request.Proposal.Hash())
+		" Hash", request.Proposal.Hash())
 	c.pendingRequestsMu.Lock()
 	defer c.pendingRequestsMu.Unlock()
 	c.pendingRequests.Push(request, -float32(request.Proposal.Number().Int64()))

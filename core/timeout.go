@@ -28,7 +28,6 @@ func (c *core) setValidatorTimeout(src ibft.Address) {
 	defer c.timeoutsMu.Unlock()
 	_, val := c.valSet.GetByAddress(src)
 	if val != nil {
-		c.logger.Info(c.address, ": Init timeout for ", src)
 		if c.timeouts[val] != nil {
 			c.timeouts[val].Stop()
 		}
