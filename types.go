@@ -53,7 +53,7 @@ func (a *Address) FromBytes(data []byte) {
 func (a Address) String() string {
 	var bytes [AddressLength]byte
 	copy(bytes[:], a[:])
-	return hex.EncodeToString(bytes[:6])
+	return hex.EncodeToString(bytes[:])
 }
 
 // Proposal interface to be used during the consensus
