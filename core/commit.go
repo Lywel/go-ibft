@@ -37,6 +37,7 @@ func (c *core) handleCommit(msg *message, src *ibft.Validator) error {
 		c.logger.Warning(c.address, ": Failed to add COMMIT message ", "msg ", msg, " err ", err)
 	}
 	if c.current.Commits.Size() > 2*c.valSet.F() && c.state.Cmp(StateCommitted) < 0 {
+		c.logger.Info("got ", c.current.Commits.Size(), " signatures, needed more than ", 2*c.valSet.F())
 		c.commit()
 	}
 	return nil

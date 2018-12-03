@@ -35,13 +35,13 @@ type Config struct {
 func New(config *Config,
 	privateKey *ecdsa.PrivateKey,
 	proposalManager ibft.ProposalManager,
-	eventProxy func(chan core.Event, chan core.Event) (chan core.Event, chan core.Event),
+	eventProxy func(chan core.Event, chan core.Event, chan []byte) (chan core.Event, chan core.Event, chan []byte),
 	customEventsInChan chan []byte) *Backend {
 
 	network := gossipnet.New(config.LocalAddr, config.RemoteAddrs)
 	in := make(chan core.Event, 256)
 	out := make(chan core.Event, 256)
-	pin, pout := eventProxy(in, out)
+	pin, pout, pcustom := eventProxy(in, out, customEventsInChan)
 
 	backend := &Backend{
 		privateKey:      privateKey,
@@ -49,7 +49,7 @@ func New(config *Config,
 		network:         network,
 		ibftEventsIn:    in,
 		ibftEventsOut:   out,
-		manager:         events.New(network, pin, pout, customEventsInChan, len(config.RemoteAddrs)),
+		manager:         events.New(network, pin, pout, pcustom, len(config.RemoteAddrs)),
 		proposalManager: proposalManager,
 		stillConnecting: len(config.RemoteAddrs),
 		localAddr:       config.LocalAddr,

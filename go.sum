@@ -6,6 +6,8 @@ bitbucket.org/ventureslash/go-gossipnet v0.1.2 h1:WS8TpUQ97Iy2SwyErFYIwk7aPy49hR
 bitbucket.org/ventureslash/go-gossipnet v0.1.2/go.mod h1:/7WFD8EmFlIjEoiqfKilIA9VlWemu51qq1sQAWhNc6E=
 bitbucket.org/ventureslash/go-gossipnet v0.2.1 h1:K2N8kLQ404TAEIfr1yefn4oF7jA3M2WXWf/TORanau0=
 bitbucket.org/ventureslash/go-gossipnet v0.2.1/go.mod h1:/7WFD8EmFlIjEoiqfKilIA9VlWemu51qq1sQAWhNc6E=
+bitbucket.org/ventureslash/go-gossipnet v0.2.2 h1:Cjhg8e8wl5Xu6UAPguAyb1tRtqAPUJNQS0PkGPzmrZc=
+bitbucket.org/ventureslash/go-gossipnet v0.2.2/go.mod h1:/7WFD8EmFlIjEoiqfKilIA9VlWemu51qq1sQAWhNc6E=
 bitbucket.org/ventureslash/go-slash-currency v0.0.0-20181114051353-9aedcc685d06 h1:YlW72FB9sGbGKuHSy+jwCN51mc6C9N889udMokVolvk=
 github.com/btcsuite/btcd v0.0.0-20181013004428-67e573d211ac h1:/zx+Hglw2JN/pwVam1Z8cTCTl4pWyrbvOn2oooqCQSs=
 github.com/btcsuite/btcd v0.0.0-20181013004428-67e573d211ac/go.mod h1:Dmm/EzmjnCiweXmzRIAiUWCInVmPgjkzgv5k4tVyXiQ=
