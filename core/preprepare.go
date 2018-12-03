@@ -15,6 +15,7 @@ func (c *core) sendPreprepare(request *ibft.Request) {
 			c.logger.Warning(c.address, ": Failed to encode")
 			return
 		}
+
 		c.broadcast(&message{
 			Type: typePreprepare,
 			Msg:  preprepare,

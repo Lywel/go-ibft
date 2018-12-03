@@ -54,7 +54,7 @@ func (c *core) handleEvents() {
 			if ev.Address != c.address {
 				res := c.valSet.AddValidator(ev.Address)
 				if res {
-					c.logger.Info(c.address, "Adding validator ", ev.Address)
+					c.logger.Info(c.address, ": Adding validator ", ev.Address)
 					c.setValidatorTimeout(ev.Address)
 				}
 			}
@@ -81,6 +81,7 @@ func (c *core) handleMsg(payload []byte) error {
 
 // handles the message, and stores it in backlog if needed
 func (c *core) handleCheckedMsg(msg *message, src *ibft.Validator) error {
+	c.setValidatorTimeout(msg.Address)
 
 	// add message in backlog if it is a future message
 	testBacklog := func(err error) error {
