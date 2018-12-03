@@ -26,7 +26,7 @@ type Manager struct {
 type networkMessage struct {
 	Type      uint
 	Data      []byte
-	Timestamp int64
+	Timestamp uint64
 }
 
 const (
@@ -59,7 +59,7 @@ func (mngr Manager) Start(addr ibft.Address) {
 	joinBytes, err := rlp.EncodeToBytes(networkMessage{
 		Type:      joinEvent,
 		Data:      addrBytes[:],
-		Timestamp: time.Now().Unix(),
+		Timestamp: uint64(time.Now().Unix()),
 	})
 	if err != nil {
 		mngr.debug.Warningf("encode error: %v", err)
@@ -185,7 +185,7 @@ func (mngr Manager) broadcast(payload []byte, msgType uint) (err error) {
 	data, err := rlp.EncodeToBytes(networkMessage{
 		Type:      msgType,
 		Data:      payload,
-		Timestamp: time.Now().Unix(),
+		Timestamp: uint64(time.Now().Unix()),
 	})
 	if err != nil {
 		return
