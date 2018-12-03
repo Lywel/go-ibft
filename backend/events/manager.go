@@ -8,6 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/google/logger"
 	"io/ioutil"
+	"time"
 )
 
 var verbose = flag.Bool("verbose-manager", false, "print manager info level logs")
@@ -23,8 +24,9 @@ type Manager struct {
 }
 
 type networkMessage struct {
-	Type uint
-	Data []byte
+	Type      uint
+	Data      []byte
+	Timestamp int64
 }
 
 const (
@@ -55,11 +57,12 @@ func (mngr Manager) Start(addr ibft.Address) {
 
 	addrBytes := addr.GetBytes()
 	joinBytes, err := rlp.EncodeToBytes(networkMessage{
-		Type: joinEvent,
-		Data: addrBytes[:],
+		Type:      joinEvent,
+		Data:      addrBytes[:],
+		Timestamp: time.Now().Unix(),
 	})
 	if err != nil {
-		mngr.debug.Warningf("encode error: ", err)
+		mngr.debug.Warningf("encode error: %v", err)
 	}
 
 	// Dispatch network events to IBFT
@@ -80,7 +83,7 @@ func (mngr Manager) Start(addr ibft.Address) {
 				var msg networkMessage
 				err := rlp.DecodeBytes(ev.Data, &msg)
 				if err != nil {
-					mngr.debug.Warningf("Error parsing msg:", string(ev.Data))
+					mngr.debug.Warningf("Error parsing msg: %s", string(ev.Data))
 					continue
 				}
 				switch msg.Type {
@@ -180,8 +183,9 @@ func (mngr Manager) Start(addr ibft.Address) {
 // forward it to the network node
 func (mngr Manager) broadcast(payload []byte, msgType uint) (err error) {
 	data, err := rlp.EncodeToBytes(networkMessage{
-		Type: msgType,
-		Data: payload,
+		Type:      msgType,
+		Data:      payload,
+		Timestamp: time.Now().Unix(),
 	})
 	if err != nil {
 		return
