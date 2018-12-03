@@ -43,6 +43,9 @@ func (c *core) handlePrepare(msg *message, src *ibft.Validator) error {
 
 		c.setState(StatePrepared)
 		c.sendCommit()
+	} else {
+		c.logger.Info("got ", c.current.Prepares.Size(), " signatures, need more than ", 2*c.valSet.F())
+
 	}
 
 	return nil
