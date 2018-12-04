@@ -66,7 +66,8 @@ func NewSet(addrs []Address) *ValidatorSet {
 	sort.Sort(valSet.validators)
 
 	if valSet.Size() > 0 {
-		valSet.proposer = valSet.validators[0]
+		proposer := *valSet.validators[0]
+		valSet.proposer = &proposer
 	}
 	return valSet
 
@@ -147,12 +148,15 @@ func (valSet *ValidatorSet) Copy() *ValidatorSet {
 	for _, v := range valSet.validators {
 		addresses = append(addresses, v.Address())
 	}
-	return NewSet(addresses)
+	res := NewSet(addresses)
+	_, res.proposer = res.GetByAddress(valSet.proposer.Address())
+	return res
 }
 
 // EncodeRLP encode a validatorSet following rlp standard
 func (valSet *ValidatorSet) EncodeRLP(w io.Writer) error {
 	addresses := make([]Address, 0, len(valSet.validators))
+	addresses = append(addresses, valSet.proposer.Address())
 	for _, v := range valSet.validators {
 		addresses = append(addresses, v.Address())
 	}
@@ -167,8 +171,10 @@ func (valSet *ValidatorSet) DecodeRLP(s *rlp.Stream) error {
 	if err := s.Decode(&addressList); err != nil {
 		return err
 	}
-	newValSet := NewSet(addressList.Addresses)
-	valSet.validators, valSet.proposer = newValSet.validators, newValSet.proposer
+	proposer := addressList.Addresses[0]
+	newValSet := NewSet(addressList.Addresses[1:])
+	valSet.validators = newValSet.validators
+	_, valSet.proposer = valSet.GetByAddress(proposer)
 
 	return nil
 }

@@ -5,7 +5,6 @@ import (
 )
 
 func (c *core) handleRequest(request *ibft.Request) error {
-	c.logger.Info("valset ", c.valSet.List(), " size ", c.valSet.Size())
 	if err := c.checkRequest(request); err != nil {
 		if err == errInvalidMessage {
 			c.logger.Warning(c.address, ": Invalid message")

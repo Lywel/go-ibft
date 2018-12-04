@@ -26,11 +26,11 @@ func (c *core) handleStateEvent(valset *ibft.ValidatorSet, view *ibft.View,
 	dest ibft.Address) {
 	// TODO: fix and add security
 	if dest == c.address {
-		c.logger.Info(c.address, " Received state")
+		c.logger.Info(c.address, ": Received state")
 		c.valSet = valset
 		c.valSet.AddValidator(c.address)
 		c.initTimeouts()
-		c.current = newRoundState(view, nil, valset, nil)
+		c.current = newRoundState(view, nil, c.valSet, nil)
 		c.logger.Info(c.address, ": view ", view)
 		// c.setState(StateAcceptRequest)
 	}
