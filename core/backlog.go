@@ -73,7 +73,7 @@ func (c *core) processBacklogs() {
 			}
 			var view *ibft.View
 			switch msg.Type {
-			case typePrepare:
+			case typePreprepare:
 				var preprepare *ibft.Preprepare
 				err := msg.Decode(&preprepare)
 				if err == nil {
