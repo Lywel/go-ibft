@@ -99,11 +99,21 @@ func (c *core) handleCheckedMsg(msg *message, src *ibft.Validator) error {
 	case typeCommit:
 		return testBacklog(c.handleCommit(msg, src))
 	case typeRoundChange:
-		c.logger.Info(c.address, ": Round change event received, ignore")
-		// TODO call handleroundchange
-		return nil
+		return testBacklog(c.handleRoundChange(msg, src))
 	default:
 		return errInvalidMessage
 	}
+
+}
+
+func (c *core) handleTimeoutMsg() {
+	if !c.waitingForRoundChange {
+		maxRound := c.roundChangeSet.MaxRound(c.valSet.F() + 1)
+		if maxRound != nil && maxRound.Cmp(c.current.round) > 0 {
+			c.sendRoundChange(maxRound)
+			return
+		}
+	}
+	c.sendNextRoundChange()
 
 }

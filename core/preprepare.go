@@ -41,7 +41,7 @@ func (c *core) handlePreprepare(msg *message, src *ibft.Validator) error {
 	}
 
 	if err := c.checkMessage(typePreprepare, preprepare.View); err != nil {
-		c.logger.Warning(c.address, ": Check message failed")
+		c.logger.Warning(c.address, ": Check message failed err ", err)
 		return err
 	}
 

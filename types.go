@@ -13,7 +13,7 @@ import (
 
 const (
 	AddressLength    = 20
-	ValidatorTimeout = 20 * time.Second
+	ValidatorTimeout = 60 * time.Second
 	RequestTimeout   = 20 * time.Second
 )
 

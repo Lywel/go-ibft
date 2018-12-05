@@ -36,6 +36,7 @@ type core struct {
 	proposalManager       ibft.ProposalManager
 	timeouts              map[*ibft.Validator]*time.Timer
 	timeoutsMu            *sync.Mutex
+	roundChangeSet        *roundChangeSet
 	roundChangeTimer      *time.Timer
 	networkMap            map[ibft.Address]string
 }
@@ -214,7 +215,12 @@ func (c *core) setState(state State) {
 func (c *core) startNewRound(round *big.Int) {
 	c.logger.Info(c.address, ": Start new sequence")
 	roundChange := false
-	// TODO check if there is a round change
+
+	// TODO UpdateSince
+
+	if round.Cmp(ibft.Big0) > 0 {
+		roundChange = true
+	}
 
 	var view *ibft.View
 	if roundChange {
@@ -222,26 +228,32 @@ func (c *core) startNewRound(round *big.Int) {
 			Sequence: new(big.Int).Set(c.current.sequence),
 			Round:    new(big.Int).Set(round),
 		}
+		c.valSet.UpdateProposer()
 	} else {
 		view = &ibft.View{
 			Sequence: new(big.Int).Add(c.current.sequence, ibft.Big1),
 			Round:    new(big.Int),
 		}
-		// TODO update validators with new list
-
-		c.waitingForRoundChange = false
-
-		c.updateRoundState(view, c.valSet, roundChange)
-		c.setState(StateAcceptRequest)
-		c.newRoundChangeTimer()
 	}
+	// TODO update validators with new list
+
+	c.roundChangeSet = newRoundChangeSet(c.valSet)
+	c.waitingForRoundChange = false
+
+	c.updateRoundState(view, c.valSet, roundChange)
+	c.setState(StateAcceptRequest)
+
+	if roundChange && c.isProposer() && c.current != nil && c.current.pendingRequest != nil {
+		c.sendPreprepare(c.current.pendingRequest)
+	}
+	c.newRoundChangeTimer()
+
 }
 
 func (c *core) updateRoundState(view *ibft.View, valSet *ibft.ValidatorSet,
 	roundChange bool) {
 	if roundChange {
-		c.logger.Info(c.address, ": Update round number")
-		// TODO round change
+		c.current = newRoundState(view, c.current.Preprepare, valSet, c.current.pendingRequest)
 	} else {
 		c.current = newRoundState(view, nil, valSet, nil)
 	}
@@ -253,6 +265,7 @@ func (c *core) newRoundChangeTimer() {
 	}
 	c.roundChangeTimer = time.AfterFunc(ibft.RequestTimeout, func() {
 		c.logger.Info(c.address, ": Round change triggered")
+		c.handleTimeoutMsg()
 	})
 }
 

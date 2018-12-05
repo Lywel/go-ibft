@@ -153,6 +153,12 @@ func (valSet *ValidatorSet) Copy() *ValidatorSet {
 	return res
 }
 
+// UpdateProposer set a new proposer after round change
+func (valSet *ValidatorSet) UpdateProposer() {
+	i, _ := valSet.GetByAddress(valSet.proposer.Address())
+	valSet.proposer = valSet.List()[(i+1)%valSet.Size()]
+}
+
 // EncodeRLP encode a validatorSet following rlp standard
 func (valSet *ValidatorSet) EncodeRLP(w io.Writer) error {
 	addresses := make([]Address, 0, len(valSet.validators))

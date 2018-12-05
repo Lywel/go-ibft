@@ -24,7 +24,6 @@ func (c *core) sendState(src ibft.Address) {
 
 func (c *core) handleStateEvent(valset *ibft.ValidatorSet, view *ibft.View,
 	dest ibft.Address) {
-	// TODO: fix and add security
 	if dest == c.address {
 		c.logger.Info(c.address, ": Received state")
 		c.valSet = valset

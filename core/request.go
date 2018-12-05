@@ -27,7 +27,8 @@ func (c *core) checkRequest(request *ibft.Request) error {
 	if request == nil || request.Proposal == nil {
 		return errInvalidMessage
 	}
-
+	c.logger.Info("request number: ", request.Proposal.Number())
+	c.logger.Info("my view: ", c.currentView())
 	if c := c.current.sequence.Cmp(request.Proposal.Number()); c > 0 {
 		return errOldMessage
 	} else if c < 0 {

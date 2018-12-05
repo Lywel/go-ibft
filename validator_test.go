@@ -99,3 +99,23 @@ func TestRlp(t *testing.T) {
 		t.Errorf("sets dont match")
 	}
 }
+
+func TestUpdateValidator(t *testing.T) {
+	var a, b, c Address = [20]byte{0, 1, 2}, [20]byte{0, 1, 2, 4}, [20]byte{0, 1, 2, 5}
+	set := NewSet([]Address{a, b, c})
+	if !set.IsProposer(a) {
+		t.Errorf("wrong proposer, expected %v, got %v", a.String(), set.GetProposer().String())
+	}
+	set.UpdateProposer()
+	if !set.IsProposer(b) {
+		t.Errorf("wrong proposer, expected %v, got %v", b.String(), set.GetProposer().String())
+	}
+	set.UpdateProposer()
+	if !set.IsProposer(c) {
+		t.Errorf("wrong proposer, expected %v, got %v", c.String(), set.GetProposer().String())
+	}
+	set.UpdateProposer()
+	if !set.IsProposer(a) {
+		t.Errorf("wrong proposer, expected %v, got %v", a.String(), set.GetProposer().String())
+	}
+}

@@ -1,9 +1,10 @@
 package core
 
 import (
-	"bitbucket.org/ventureslash/go-ibft"
 	"math/big"
 	"sync"
+
+	"bitbucket.org/ventureslash/go-ibft"
 )
 
 // map messages to validator address
@@ -57,6 +58,17 @@ func (ms *messageSet) Get(addr ibft.Address) *message {
 	ms.messagesMu.Lock()
 	defer ms.messagesMu.Unlock()
 	return ms.messages[addr]
+}
+
+func (ms *messageSet) Values() (result []*message) {
+	ms.messagesMu.Lock()
+	defer ms.messagesMu.Unlock()
+
+	for _, v := range ms.messages {
+		result = append(result, v)
+	}
+
+	return result
 }
 
 func (ms *messageSet) verifyAddr(msg *message) bool {
