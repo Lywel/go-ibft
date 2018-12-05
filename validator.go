@@ -1,14 +1,14 @@
 package ibft
 
 import (
+	"fmt"
+	"github.com/ethereum/go-ethereum/rlp"
 	"io"
 	"math"
 	"reflect"
 	"sort"
 	"strings"
 	"sync"
-
-	"github.com/ethereum/go-ethereum/rlp"
 )
 
 // Validator is a node of the consensus
@@ -177,4 +177,13 @@ func (valSet *ValidatorSet) DecodeRLP(s *rlp.Stream) error {
 	_, valSet.proposer = valSet.GetByAddress(proposer)
 
 	return nil
+}
+
+func (valSet *ValidatorSet) String() string {
+	var b strings.Builder
+	b.WriteString("validators: ")
+	fmt.Fprintf(&b, "%s, ", valSet.validators)
+	b.WriteString("proposer: ")
+	fmt.Fprintf(&b, "%s", valSet.proposer)
+	return b.String()
 }

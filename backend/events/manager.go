@@ -80,10 +80,11 @@ func (mngr Manager) Start(addr ibft.Address) {
 				mngr.debug.Info("ConnCloseEvent")
 			case gossipnet.DataEvent:
 				mngr.debug.Info("DataEvent")
+				mngr.debug.Infof("Parsing %d bytes", len(ev.Data))
 				var msg networkMessage
 				err := rlp.DecodeBytes(ev.Data, &msg)
 				if err != nil {
-					mngr.debug.Warningf("Error parsing msg: %s", string(ev.Data))
+					mngr.debug.Warningf("Error parsing msg: %v", err)
 					continue
 				}
 				switch msg.Type {
@@ -150,8 +151,10 @@ func (mngr Manager) Start(addr ibft.Address) {
 		for event := range mngr.eventsOut {
 			switch ev := event.(type) {
 			case core.MessageEvent:
+				mngr.debug.Infof("Broadcasting core.MessageEvent")
 				mngr.broadcast(ev.Payload, messageEvent)
 			case core.AddValidatorEvent:
+				mngr.debug.Infof("Broadcasting core.AddValidatorEvent: %s", ev)
 				evBytes, err := rlp.EncodeToBytes(ev)
 				if err != nil {
 					mngr.debug.Warning(err)
@@ -159,7 +162,7 @@ func (mngr Manager) Start(addr ibft.Address) {
 				}
 				mngr.broadcast(evBytes, addValidatorEvent)
 			case core.StateEvent:
-				mngr.debug.Infof("encoded view: %s", ev.View)
+				mngr.debug.Infof("Broadcasting core.SateEvent: %s", ev)
 				evBytes, err := rlp.EncodeToBytes(ev)
 				if err != nil {
 					mngr.debug.Warning(err)
@@ -167,6 +170,7 @@ func (mngr Manager) Start(addr ibft.Address) {
 				}
 				mngr.broadcast(evBytes, stateEvent)
 			case core.EncodedRequestEvent:
+				mngr.debug.Infof("Broadcasting core.EncodedRequestEvent: %s", ev)
 				evBytes, err := rlp.EncodeToBytes(ev)
 				if err != nil {
 					mngr.debug.Warning(err)
