@@ -2,13 +2,14 @@ package ibft
 
 import (
 	"fmt"
-	"github.com/ethereum/go-ethereum/rlp"
 	"io"
 	"math"
 	"reflect"
 	"sort"
 	"strings"
 	"sync"
+
+	"github.com/ethereum/go-ethereum/rlp"
 )
 
 // Validator is a node of the consensus
@@ -105,6 +106,11 @@ func (valSet *ValidatorSet) AddValidator(address Address) bool {
 func (valSet *ValidatorSet) RemoveValidator(address Address) bool {
 	valSet.validatorMu.Lock()
 	defer valSet.validatorMu.Unlock()
+	_, p := valSet.GetByAddress(address)
+	if p == valSet.proposer {
+		valSet.UpdateProposer()
+	}
+
 	for i, v := range valSet.validators {
 		if v.String() == address.String() {
 			valSet.validators = append(valSet.validators[:i], valSet.validators[i+1:]...)
