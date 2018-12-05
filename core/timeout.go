@@ -32,6 +32,9 @@ func (c *core) setValidatorTimeout(src ibft.Address) {
 			c.timeouts[val].Stop()
 		}
 		src := val.Address()
+		if src == c.address {
+			return
+		}
 
 		c.timeouts[val] = time.AfterFunc(ibft.ValidatorTimeout, func() {
 
