@@ -1,14 +1,15 @@
 package events
 
 import (
+	"flag"
+	"io/ioutil"
+	"time"
+
 	"bitbucket.org/ventureslash/go-gossipnet"
 	"bitbucket.org/ventureslash/go-ibft"
 	"bitbucket.org/ventureslash/go-ibft/core"
-	"flag"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/google/logger"
-	"io/ioutil"
-	"time"
 )
 
 var verbose = flag.Bool("verbose-manager", false, "print manager info level logs")
@@ -18,7 +19,7 @@ type Manager struct {
 	node           *gossipnet.Node
 	eventsOut      chan core.Event
 	eventsIn       chan core.Event
-	eventsCustom   chan []byte
+	eventsCustom   chan core.CustomEvent
 	nodesToConnect int
 	debug          *logger.Logger
 }
@@ -37,10 +38,11 @@ const (
 	stateEvent
 	addValidatorEvent
 	customEvent
+	validatorSetEvent
 )
 
 // New returns a new network.Manager
-func New(node *gossipnet.Node, eventsIn, eventsOut chan core.Event, eventsCustom chan []byte, nodesToConnect int) Manager {
+func New(node *gossipnet.Node, eventsIn, eventsOut chan core.Event, eventsCustom chan core.CustomEvent, nodesToConnect int) Manager {
 	return Manager{
 		node:           node,
 		eventsIn:       eventsIn,
@@ -114,15 +116,11 @@ func (mngr Manager) Start(addr ibft.Address) {
 
 					// If it's not youself => forwrd to POA
 					mngr.eventsIn <- evt
-				case stateEvent:
-					mngr.debug.Info(" -StateEvent")
-					evt := core.StateEvent{}
-					rlp.DecodeBytes(msg.Data, &evt)
-					if err != nil {
-						mngr.debug.Warning(err)
-						continue
+					mngr.eventsCustom <- core.CustomEvent{
+						Type: 0, // Join event
+						Msg:  msg.Data,
 					}
-					mngr.eventsIn <- evt
+
 				case requestEvent:
 					mngr.debug.Info(" -RequestEvent")
 					evt := core.EncodedRequestEvent{}
@@ -142,9 +140,18 @@ func (mngr Manager) Start(addr ibft.Address) {
 						continue
 					}
 					mngr.eventsIn <- evt
+				case validatorSetEvent:
+					mngr.debug.Info(" -ValidatorSetEvent")
+					mngr.eventsCustom <- core.CustomEvent{
+						Type: 1, // ValidatorSet event
+						Msg:  msg.Data,
+					}
 				case customEvent:
 					mngr.debug.Info(" -customEvent")
-					mngr.eventsCustom <- msg.Data
+					mngr.eventsCustom <- core.CustomEvent{
+						Type: 2, // Other events
+						Msg:  msg.Data,
+					}
 				}
 			case gossipnet.ListenEvent:
 				mngr.debug.Info("ListenEvent")
@@ -171,14 +178,7 @@ func (mngr Manager) Start(addr ibft.Address) {
 					return
 				}
 				mngr.broadcast(evBytes, addValidatorEvent)
-			case core.StateEvent:
-				mngr.debug.Infof("Broadcasting core.SateEvent: %s", ev)
-				evBytes, err := rlp.EncodeToBytes(ev)
-				if err != nil {
-					mngr.debug.Warning(err)
-					return
-				}
-				mngr.broadcast(evBytes, stateEvent)
+
 			case core.EncodedRequestEvent:
 				mngr.debug.Infof("Broadcasting core.EncodedRequestEvent: %s", ev)
 				evBytes, err := rlp.EncodeToBytes(ev)
@@ -187,7 +187,14 @@ func (mngr Manager) Start(addr ibft.Address) {
 					return
 				}
 				mngr.broadcast(evBytes, requestEvent)
-
+			case core.ValidatorSetEvent:
+				mngr.debug.Infof("Broadcasting core.ValidatorSetEvent: %s", ev)
+				evBytes, err := rlp.EncodeToBytes(ev)
+				if err != nil {
+					mngr.debug.Warning(err)
+					return
+				}
+				mngr.broadcast(evBytes, validatorSetEvent)
 			}
 		}
 	}()

@@ -45,11 +45,14 @@ type RemoveValidatorEvent struct {
 	Address ibft.Address
 }
 
-// StateEvent  is emmitted when a peer joins the network
-type StateEvent struct {
+type ValidatorSetEvent struct {
 	ValSet *ibft.ValidatorSet
-	View   *ibft.View
 	Dest   ibft.Address
+}
+
+type CustomEvent struct {
+	Type uint
+	Msg  []byte
 }
 
 type TimeOutEvent struct{}

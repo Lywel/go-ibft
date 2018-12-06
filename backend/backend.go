@@ -16,7 +16,6 @@ type Backend struct {
 	address         ibft.Address
 	network         *gossipnet.Node
 	core            ibft.Core
-	coreRunning     bool
 	ibftEventsIn    chan core.Event
 	ibftEventsOut   chan core.Event
 	manager         events.Manager
@@ -35,8 +34,8 @@ type Config struct {
 func New(config *Config,
 	privateKey *ecdsa.PrivateKey,
 	proposalManager ibft.ProposalManager,
-	eventProxy func(chan core.Event, chan core.Event, chan []byte) (chan core.Event, chan core.Event, chan []byte),
-	customEventsInChan chan []byte) *Backend {
+	eventProxy func(chan core.Event, chan core.Event, chan core.CustomEvent) (chan core.Event, chan core.Event, chan core.CustomEvent),
+	customEventsInChan chan core.CustomEvent) *Backend {
 
 	network := gossipnet.New(config.LocalAddr, config.RemoteAddrs)
 	in := make(chan core.Event, 256)
@@ -72,23 +71,28 @@ func (b *Backend) PrivateKey() *ecdsa.PrivateKey {
 
 // Start implements Engine.Start
 func (b *Backend) Start() {
-	if b.coreRunning {
-		return
-	}
 	b.manager.Start(b.address)
 	b.network.Start()
-	b.core.Start()
-	b.coreRunning = true
 }
 
 // Stop implements Engine.Stop
 func (b *Backend) Stop() {
-	if !b.coreRunning {
-		return
-	}
 	b.network.Stop()
+}
+
+// Address returns the ibft address of the validator
+func (b *Backend) Address() ibft.Address {
+	return b.address
+}
+
+// StartCore will start the core
+func (b *Backend) StartCore(valSet *ibft.ValidatorSet, view *ibft.View) {
+	b.core.Start(valSet, view)
+}
+
+// StopCore will stop the core
+func (b *Backend) StopCore() {
 	b.core.Stop()
-	b.coreRunning = false
 }
 
 // EventsInChan returns a channel receiving network events

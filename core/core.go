@@ -82,10 +82,12 @@ func (c *core) NetworkMap() map[ibft.Address]string {
 }
 
 // Start implements core.Start
-func (c *core) Start() {
-	//c.eventsOut <- JoinEvent{Address: c.address}
+func (c *core) Start(valSet *ibft.ValidatorSet, view *ibft.View) {
+	c.valSet = valSet
+	c.current = newRoundState(view, nil, valSet, nil)
 	c.startNewRound(ibft.Big0)
 	c.logger.Info("Core started")
+	c.logger.Info("valset: ", valSet)
 	go c.handleEvents()
 }
 

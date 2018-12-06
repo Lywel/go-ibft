@@ -44,20 +44,8 @@ func (c *core) handleEvents() {
 			if ev.Address != c.address {
 				c.logger.Info(c.address, ": New peer: ", ev.Address)
 				c.networkMap[ev.Address] = ev.NetworkAddr
-				c.handleJoin(ev.Address)
 			}
 
-		case StateEvent:
-			c.logger.Info(c.address, ": Received stateEvent ", "view ", ev.View)
-			c.handleStateEvent(ev.ValSet, ev.View, ev.Dest)
-		case AddValidatorEvent:
-			if ev.Address != c.address {
-				res := c.valSet.AddValidator(ev.Address)
-				if res {
-					c.logger.Info(c.address, ": Adding validator ", ev.Address)
-					c.setValidatorTimeout(ev.Address)
-				}
-			}
 		}
 
 	}

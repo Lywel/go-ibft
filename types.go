@@ -24,7 +24,7 @@ var (
 
 // Engine can be started and stoped
 type Core interface {
-	Start()
+	Start(valSet *ValidatorSet, view *View)
 	Stop()
 	NetworkMap() map[Address]string
 }
