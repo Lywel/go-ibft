@@ -103,6 +103,16 @@ func (mngr Manager) Start(addr ibft.Address) {
 						mngr.debug.Warning(err)
 						continue
 					}
+					if evt.Address == addr {
+						mngr.debug.Errorf("Don't add someone using your identity. It might even be yourself: disconnecting...")
+						err := mngr.node.RemovePeer(evt.NetworkAddr)
+						if err != nil {
+							mngr.debug.Warningf("RemovePeer failed: %v", err)
+						}
+						continue
+					}
+
+					// If it's not youself => forwrd to POA
 					mngr.eventsIn <- evt
 				case stateEvent:
 					mngr.debug.Info(" -StateEvent")
