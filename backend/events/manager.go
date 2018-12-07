@@ -117,7 +117,7 @@ func (mngr Manager) Start(addr ibft.Address) {
 					// If it's not youself => forwrd to POA
 					mngr.eventsIn <- evt
 					mngr.eventsCustom <- core.CustomEvent{
-						Type: 0, // Join event
+						Type: ibft.TypeJoinEvent,
 						Msg:  msg.Data,
 					}
 
@@ -143,13 +143,13 @@ func (mngr Manager) Start(addr ibft.Address) {
 				case validatorSetEvent:
 					mngr.debug.Info(" -ValidatorSetEvent")
 					mngr.eventsCustom <- core.CustomEvent{
-						Type: 1, // ValidatorSet event
+						Type: ibft.TypeValidatorSetEvent,
 						Msg:  msg.Data,
 					}
 				case customEvent:
 					mngr.debug.Info(" -customEvent")
 					mngr.eventsCustom <- core.CustomEvent{
-						Type: 2, // Other events
+						Type: ibft.TypeCustomEvents,
 						Msg:  msg.Data,
 					}
 				}

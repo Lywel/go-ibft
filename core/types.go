@@ -51,6 +51,7 @@ type backend interface {
 	PrivateKey() *ecdsa.PrivateKey
 	EventsInChan() chan Event
 	EventsOutChan() chan Event
+	EventsCustom() chan CustomEvent
 }
 
 const (

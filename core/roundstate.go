@@ -42,3 +42,18 @@ func (s *roundState) Subject() *ibft.Subject {
 		Digest: s.Preprepare.Proposal.Hash(),
 	}
 }
+
+func (s *roundState) GetPrepareOrCommitSize() int {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	result := s.Prepares.Size() + s.Commits.Size()
+
+	// find duplicate one
+	for _, m := range s.Prepares.Values() {
+		if s.Commits.Get(m.Address) != nil {
+			result--
+		}
+	}
+	return result
+}

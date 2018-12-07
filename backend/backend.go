@@ -18,6 +18,7 @@ type Backend struct {
 	core            ibft.Core
 	ibftEventsIn    chan core.Event
 	ibftEventsOut   chan core.Event
+	eventsCustom    chan core.CustomEvent
 	manager         events.Manager
 	proposalManager ibft.ProposalManager
 	stillConnecting int
@@ -48,6 +49,7 @@ func New(config *Config,
 		network:         network,
 		ibftEventsIn:    in,
 		ibftEventsOut:   out,
+		eventsCustom:    customEventsInChan,
 		manager:         events.New(network, pin, pout, pcustom, len(config.RemoteAddrs)),
 		proposalManager: proposalManager,
 		stillConnecting: len(config.RemoteAddrs),
@@ -103,4 +105,9 @@ func (b *Backend) EventsInChan() chan core.Event {
 // EventsOutChan returns a channel used to emit events to the network
 func (b *Backend) EventsOutChan() chan core.Event {
 	return b.ibftEventsOut
+}
+
+// EventsCustom returns a channel used to emit custom events
+func (b *Backend) EventsCustom() chan core.CustomEvent {
+	return b.eventsCustom
 }

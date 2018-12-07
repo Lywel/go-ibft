@@ -88,6 +88,7 @@ func (c *core) Start(valSet *ibft.ValidatorSet, view *ibft.View) {
 	c.startNewRound(ibft.Big0)
 	c.logger.Info("Core started")
 	c.logger.Info("valset: ", valSet)
+	c.initTimeouts()
 	go c.handleEvents()
 }
 

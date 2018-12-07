@@ -38,7 +38,7 @@ func (c *core) handlePrepare(msg *message, src *ibft.Validator) error {
 	if err := c.current.Prepares.Add(msg); err != nil {
 		c.logger.Warning(c.address, ": Failed to add PREPARE message ", "msg ", msg, " err ", err)
 	}
-	if c.current.Prepares.Size() > 2*c.valSet.F() && c.state.Cmp(StatePrepared) < 0 {
+	if c.current.GetPrepareOrCommitSize() > 2*c.valSet.F() && c.state.Cmp(StatePrepared) < 0 {
 		c.logger.Info("got ", c.current.Prepares.Size(), " signatures, needed more than ", 2*c.valSet.F())
 
 		c.setState(StatePrepared)

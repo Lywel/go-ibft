@@ -16,10 +16,14 @@ func (c *core) initTimeouts() {
 			c.logger.Info(c.address, ": Init timeout for ", src)
 			c.timeouts[val] = time.AfterFunc(ibft.ValidatorTimeout, func() {
 				c.logger.Info(c.address, ": Timeout:  deleting validator ", src)
-				c.valSet.RemoveValidator(src)
+				addrBytes := src.GetBytes()
+				data := addrBytes[:]
+				c.backend.EventsCustom() <- CustomEvent{
+					Type: ibft.TypeRemoveValidatorEvent,
+					Msg:  data,
+				}
 			})
 		}
-
 	}
 }
 
@@ -39,7 +43,12 @@ func (c *core) setValidatorTimeout(src ibft.Address) {
 		c.timeouts[val] = time.AfterFunc(ibft.ValidatorTimeout, func() {
 
 			c.logger.Info(c.address, ": Timeout: deleting validator ", src)
-			c.valSet.RemoveValidator(src)
+			addrBytes := src.GetBytes()
+			data := addrBytes[:]
+			c.backend.EventsCustom() <- CustomEvent{
+				Type: ibft.TypeRemoveValidatorEvent,
+				Msg:  data,
+			}
 		})
 	}
 }

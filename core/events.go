@@ -41,10 +41,6 @@ type AddValidatorEvent struct {
 	Address ibft.Address
 }
 
-type RemoveValidatorEvent struct {
-	Address ibft.Address
-}
-
 type ValidatorSetEvent struct {
 	ValSet *ibft.ValidatorSet
 	Dest   ibft.Address

@@ -17,6 +17,13 @@ const (
 	RequestTimeout   = 20 * time.Second
 )
 
+const (
+	TypeJoinEvent = iota
+	TypeValidatorSetEvent
+	TypeRemoveValidatorEvent
+	TypeCustomEvents
+)
+
 var (
 	Big0 = big.NewInt(0)
 	Big1 = big.NewInt(1)
