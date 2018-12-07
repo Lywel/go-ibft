@@ -131,15 +131,7 @@ func (mngr Manager) Start(addr ibft.Address) {
 					}
 
 					mngr.eventsIn <- evt
-				case addValidatorEvent:
-					mngr.debug.Info(" -AddValidatorEvent")
-					evt := core.AddValidatorEvent{}
-					rlp.DecodeBytes(msg.Data, &evt)
-					if err != nil {
-						mngr.debug.Warning(err)
-						continue
-					}
-					mngr.eventsIn <- evt
+
 				case validatorSetEvent:
 					mngr.debug.Info(" -ValidatorSetEvent")
 					mngr.eventsCustom <- core.CustomEvent{

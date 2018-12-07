@@ -39,7 +39,6 @@ func (c *core) setValidatorTimeout(src ibft.Address) {
 		if src == c.address {
 			return
 		}
-
 		c.timeouts[val] = time.AfterFunc(ibft.ValidatorTimeout, func() {
 
 			c.logger.Info(c.address, ": Timeout: deleting validator ", src)

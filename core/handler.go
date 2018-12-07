@@ -45,7 +45,9 @@ func (c *core) handleEvents() {
 				c.logger.Info(c.address, ": New peer: ", ev.Address)
 				c.networkMap[ev.Address] = ev.NetworkAddr
 			}
-
+		case AddValidatorEvent:
+			c.valSet.AddValidator(ev.Address)
+			c.setValidatorTimeout(ev.Address)
 		}
 
 	}
