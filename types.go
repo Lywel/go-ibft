@@ -7,14 +7,21 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/crypto/sha3"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
 const (
-	AddressLength    = 20
+	// HashLength is the expected length of the hash
+	HashLength = 32
+	// AddressLength is the expected length of the address
+	AddressLength = 20
+	// ValidatorTimeout is ??
 	ValidatorTimeout = 60 * time.Second
-	RequestTimeout   = 20 * time.Second
+	// RequestTimeout is ??
+	RequestTimeout = 20 * time.Second
 )
 
 const (
@@ -29,11 +36,46 @@ var (
 	Big1 = big.NewInt(1)
 )
 
-// Engine can be started and stoped
+// Core can be started and stoped
 type Core interface {
 	Start(valSet *ValidatorSet, view *View)
 	Stop()
 	NetworkMap() map[Address]string
+}
+
+// Hash is the common hash
+type Hash [HashLength]byte
+
+// Bytes returns a hash as bytes
+func (h Hash) Bytes() []byte {
+	return h[:]
+}
+
+// BytesToHash sets b to hash.
+// If b is larger than len(h), b will be cropped from the left.
+func BytesToHash(b []byte) Hash {
+	var h Hash
+	h.SetBytes(b)
+	return h
+}
+
+// SetBytes sets the hash to the value of b.
+// If b is larger than len(h), b will be cropped from the left.
+func (h *Hash) SetBytes(b []byte) {
+	if len(b) > len(h) {
+		b = b[len(b)-HashLength:]
+	}
+
+	copy(h[HashLength-len(b):], b)
+}
+
+// RlpHash return the keccak256 hash of the rlp encoding of an interface
+func RlpHash(x interface{}) Hash {
+	var h common.Hash
+	hw := sha3.NewKeccak256()
+	rlp.Encode(hw, x)
+	hw.Sum(h[:0])
+	return BytesToHash(h.Bytes())
 }
 
 // Address of client
@@ -66,7 +108,7 @@ func (a Address) String() string {
 // Proposal interface to be used during the consensus
 type Proposal interface {
 	Number() *big.Int
-	Hash() []byte
+	Hash() Hash
 	String() string
 	EncodeRLP(w io.Writer) error
 	DecodeRLP(s *rlp.Stream) error
@@ -112,6 +154,7 @@ type Preprepare struct {
 	Proposal Proposal
 }
 
+// EncodeRLP implements RLPEncoder
 func (b *Preprepare) EncodeRLP(w io.Writer) error {
 	return rlp.Encode(w, []interface{}{b.View, b.Proposal})
 }
@@ -132,7 +175,7 @@ func (b *EncodedPreprepare) DecodeRLP(s *rlp.Stream) error {
 // Subject include the proposal digest and the current view
 type Subject struct {
 	View   *View
-	Digest []byte
+	Digest Hash
 }
 
 // EncodeRLP serializes b into the Ethereum RLP format.
@@ -144,7 +187,7 @@ func (b *Subject) EncodeRLP(w io.Writer) error {
 func (b *Subject) DecodeRLP(s *rlp.Stream) error {
 	var subject struct {
 		View   *View
-		Digest []byte
+		Digest Hash
 	}
 
 	if err := s.Decode(&subject); err != nil {
@@ -154,6 +197,7 @@ func (b *Subject) DecodeRLP(s *rlp.Stream) error {
 	return nil
 }
 
+// ProposalManager is able to decode verify and commit a Proposal
 type ProposalManager interface {
 	DecodeProposal(prop *EncodedProposal) (Proposal, error)
 	Verify(proposal Proposal) error

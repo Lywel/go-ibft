@@ -93,7 +93,7 @@ func (c *core) sendRoundChange(round *big.Int) {
 	cv = c.currentView()
 	rc := &ibft.Subject{
 		View:   cv,
-		Digest: []byte{},
+		Digest: ibft.Hash{},
 	}
 
 	payload, err := Encode(rc)
