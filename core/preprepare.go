@@ -27,7 +27,11 @@ func (c *core) handlePreprepare(msg *message, src *ibft.Validator) error {
 	c.logger.Info(c.address, ": Handle preprepare from ", src.String())
 
 	var encodedPreprepare *ibft.EncodedPreprepare
-	msg.Decode(&encodedPreprepare)
+	err := msg.Decode(&encodedPreprepare)
+	if err != nil {
+		c.logger.Warning("failed to decode msg ", "err ", err)
+		return err
+	}
 
 	proposal, err := c.proposalManager.DecodeProposal(encodedPreprepare.Prop)
 	if err != nil {

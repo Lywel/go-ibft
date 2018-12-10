@@ -112,6 +112,7 @@ type Proposal interface {
 	String() string
 	EncodeRLP(w io.Writer) error
 	DecodeRLP(s *rlp.Stream) error
+	ExportAsRLPEncodedProposal() ([]byte, error)
 }
 
 // Request is the original request of the client
@@ -156,7 +157,11 @@ type Preprepare struct {
 
 // EncodeRLP implements RLPEncoder
 func (b *Preprepare) EncodeRLP(w io.Writer) error {
-	return rlp.Encode(w, []interface{}{b.View, b.Proposal})
+	encodedProposal, err := b.Proposal.ExportAsRLPEncodedProposal()
+	if err != nil {
+		return err
+	}
+	return rlp.Encode(w, []interface{}{b.View, encodedProposal})
 }
 
 // DecodeRLP implements rlp.Decoder, and load the consensus fields from a RLP stream.
