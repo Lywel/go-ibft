@@ -200,7 +200,7 @@ func (c *core) commit() {
 
 		} else {
 			c.logger.Warning(c.address, ": Commit failed ", "err ", err)
-			//TODO trigger change view
+			c.sendNextRoundChange()
 		}
 	}
 }
@@ -238,8 +238,6 @@ func (c *core) startNewRound(round *big.Int) {
 			Round:    new(big.Int),
 		}
 	}
-	// TODO update validators with new list
-
 	c.roundChangeSet = newRoundChangeSet(c.valSet)
 	c.waitingForRoundChange = false
 
