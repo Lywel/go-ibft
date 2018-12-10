@@ -168,12 +168,14 @@ func (b *Preprepare) EncodeRLP(w io.Writer) error {
 func (b *EncodedPreprepare) DecodeRLP(s *rlp.Stream) error {
 	var encodedPreprepare struct {
 		View *View
-		Prop *EncodedProposal
+		Prop []byte
 	}
 	if err := s.Decode(&encodedPreprepare); err != nil {
 		return err
 	}
-	b.View, b.Prop = encodedPreprepare.View, encodedPreprepare.Prop
+	var ep *EncodedProposal
+	rlp.DecodeBytes(encodedPreprepare.Prop, &ep)
+	b.View, b.Prop = encodedPreprepare.View, ep
 	return nil
 }
 
