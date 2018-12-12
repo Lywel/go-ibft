@@ -95,7 +95,6 @@ func (c *core) Start(valSet *ibft.ValidatorSet, view *ibft.View) {
 // Stop implements core.Stop
 func (c *core) Stop() {
 	c.logger.Info(c.address, ": Stopping the core")
-	c.wg.Wait()
 	c.logger.Info(c.address, ": Core stopped")
 }
 
