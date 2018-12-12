@@ -19,9 +19,9 @@ const (
 	// AddressLength is the expected length of the address
 	AddressLength = 20
 	// ValidatorTimeout is ??
-	ValidatorTimeout = 60 * time.Second
+	ValidatorTimeout = 120 * time.Second
 	// RequestTimeout is ??
-	RequestTimeout = 20 * time.Second
+	RequestTimeout = 40 * time.Second
 )
 
 const (
